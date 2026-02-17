@@ -104,3 +104,47 @@ setInterval(() => {
 }, 2000);
 
 updateXPBar();
+
+// Player sprite
+
+const FRAME_WIDTH = 64;
+const FRAME_HEIGHT = 64;
+
+const playerElement = document.getElementById("player");
+
+function setPlayerFrame(row, col) {
+    const x = col * FRAME_WIDTH;
+    const y = row * FRAME_HEIGHT;
+    playerElement.style.backgroundPosition = `-${x}px -${y}px`;
+}
+
+setPlayerFrame(0, 0); // row 0, col 0 (idle down)
+
+const IDLE_UP = [0, 0];
+const IDLE_LEFT = [1, 0];
+const IDLE_RIGHT = [2, 0];
+const IDLE_DOWN = [3, 0];
+
+let idleRow = 0;   // default facing down
+let idleFrame = 0; // 0 or 1
+
+function animateIdle() {
+    idleFrame = (idleFrame + 1) % 12; // cycles 0 → 1 → 0 → 1
+    setPlayerFrame(idleRow, idleFrame);
+}
+
+setInterval(animateIdle, 150); // animate every 0.5 seconds
+
+function setIdleDirection(direction) {
+    if (direction === "up")    idleRow = 0;
+    if (direction === "left")  idleRow = 1;
+    if (direction === "right") idleRow = 2;
+    if (direction === "down")  idleRow = 3;
+}
+
+
+
+setIdleDirection(lastDirection);
+
+setPlayerFrame(...IDLE_DOWN);
+

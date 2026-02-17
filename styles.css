@@ -69,3 +69,19 @@
     background-color: rgb(116, 6, 167);
     transition: width 0.2s linear;
 }
+
+#player {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(2);
+    background-image: url("sprites/swordsMan/Swordsman_lvl3_Idle_without_shadow.png");
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    z-index: 10;
+}
+
+
+
