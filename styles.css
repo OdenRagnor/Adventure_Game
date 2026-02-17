@@ -1,0 +1,71 @@
+#playerIcon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    height: 40px;
+    width: 40px;
+    border: 2px solid whitesmoke;
+    border-radius: 20px;
+    z-index: 1;
+}
+
+#healthBar {
+    position: absolute;
+    top: 10px;
+    left: 37px;
+    width: 150px;
+    height: 18px;
+    background-color: #747272;
+    border: 2px solid whitesmoke;
+    box-sizing: border-box;
+    border-radius: 0px 20px 0px 0px;
+}
+
+#healthBarFill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(13, 151, 0);
+    transition: width 0.2s linear;
+    border-radius: 0px 20px 0px 0px;
+}
+
+#staminaBar {
+    position: absolute;
+    top: 36px;
+    left: 37px;
+    width: 150px;
+    height: 18px;
+    background-color: #747272;
+    border: 2px solid whitesmoke;
+    box-sizing: border-box;
+    border-radius: 0px 0px 20px 0px;
+}
+
+#staminaBarFill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(6, 1, 247);
+    transition: width 0.2s linear;
+    border-radius: 0px 0px 20px 0px;
+}
+
+#xpBar {
+    position: absolute;
+    top: 27px;
+    left: 40px;
+    width: 147px;
+    height: 10px;
+    background-color: #747272;
+    border: 2px solid whitesmoke;
+    box-sizing: border-box;
+}
+
+#xpBarFill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(116, 6, 167);
+    transition: width 0.2s linear;
+}
