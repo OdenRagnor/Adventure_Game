@@ -1,3 +1,10 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+
 #playerIcon {
     position: absolute;
     top: 10px;
@@ -83,5 +90,39 @@
     z-index: 10;
 }
 
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300000px;
+    height: 300000px;
+    overflow: hidden;
+    z-index: 1;
+    background-color: black;
+}
+
+
+#tile1{
+    height: 50px;
+    width: 50px;
+    transform: scale(5);
+    z-index: 1;
+}
+
+#ui {
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; 
+    z-index: 9999; /* or any high number */ 
+    pointer-events: none; /* optional: lets clicks pass through */
+}
+
+.sprite {
+    position: absolute;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+    transform: scale(4);
+    transform-origin: top left;
+}
 
 

@@ -120,31 +120,240 @@ function setPlayerFrame(row, col) {
 
 setPlayerFrame(0, 0); // row 0, col 0 (idle down)
 
-const IDLE_UP = [0, 0];
+const IDLE_DOWN = [0, 0];
 const IDLE_LEFT = [1, 0];
 const IDLE_RIGHT = [2, 0];
-const IDLE_DOWN = [3, 0];
+const IDLE_UP = [3, 0];
 
-let idleRow = 0;   // default facing down
-let idleFrame = 0; // 0 or 1
+const IDLE_FRAMES = {
+    down: 12,
+    left: 12,
+    right: 12,
+    up: 4   // ← this one is slower
+};
 
-function animateIdle() {
-    idleFrame = (idleFrame + 1) % 12; // cycles 0 → 1 → 0 → 1
-    setPlayerFrame(idleRow, idleFrame);
+const IDLE_SPEED = {
+    down: 100,
+    left: 100,
+    right: 100,
+    up: 400   // ← 3× slower (150 × 3)
+};
+
+let lastIdleTime = 0;
+let idleRow = 0;
+let idleFrame = 0;
+
+function updateIdleAnimation(timestamp) {
+    const dir = ["down", "left", "right", "up"][idleRow];
+    const frameCount = IDLE_FRAMES[dir];
+    const speed = IDLE_SPEED[dir];
+
+    if (timestamp - lastIdleTime >= speed) {
+        idleFrame = (idleFrame + 1) % frameCount;
+        setPlayerFrame(idleRow, idleFrame);
+        lastIdleTime = timestamp;
+    }
 }
 
-setInterval(animateIdle, 150); // animate every 0.5 seconds
 
 function setIdleDirection(direction) {
-    if (direction === "up")    idleRow = 0;
-    if (direction === "left")  idleRow = 1;
-    if (direction === "right") idleRow = 2;
-    if (direction === "down")  idleRow = 3;
+    let newRow = idleRow;
+
+    if (direction === "up")    newRow = 3;
+    if (direction === "left")  newRow = 1;
+    if (direction === "right") newRow = 2;
+    if (direction === "down")  newRow = 0;
+
+    // Only reset if direction actually changed
+    if (newRow !== idleRow) {
+        idleRow = newRow;
+        idleFrame = 0;          // reset animation frame
+        lastIdleTime = 0;       // reset animation timer
+        setPlayerFrame(idleRow, idleFrame); // update immediately
+    }
 }
 
 
+let playerX = 300; // starting pixel position
+let playerY = 300;
+const playerSpeed = 4;
 
-setIdleDirection(lastDirection);
+//setIdleDirection(lastDirection);
 
 setPlayerFrame(...IDLE_DOWN);
 
+
+const keys = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false,
+    w: false,
+    a: false,
+    s: false,
+    d: false
+};
+
+document.addEventListener("keydown", (e) => {
+    if (keys[e.key] !== undefined) keys[e.key] = true;
+});
+
+document.addEventListener("keyup", (e) => {
+    if (keys[e.key] !== undefined) keys[e.key] = false;
+});
+
+let cameraX = 0;
+let cameraY = 0;
+
+function gameLoop(timestamp) {
+    let moving = false;
+
+    if (keys.ArrowUp || keys.w) {
+        playerY -= playerSpeed;
+        setIdleDirection("up");
+        moving = true;
+    }
+    if (keys.ArrowDown || keys.s) {
+        playerY += playerSpeed;
+        setIdleDirection("down");
+        moving = true;
+    }
+    if (keys.ArrowLeft || keys.a) {
+        playerX -= playerSpeed;
+        setIdleDirection("left");
+        moving = true;
+    }
+    if (keys.ArrowRight || keys.d) {
+        playerX += playerSpeed;
+        setIdleDirection("right");
+        moving = true;
+    }
+
+    // CAMERA FOLLOWS PLAYER
+    cameraX = playerX - window.innerWidth / 2;
+    cameraY = playerY - window.innerHeight / 2;
+
+    background.style.left = -cameraX + "px";
+    background.style.top = -cameraY + "px";
+
+    // IDLE ANIMATION
+    updateIdleAnimation(timestamp);
+
+    requestAnimationFrame(gameLoop);
+}
+
+requestAnimationFrame(gameLoop);
+
+
+// Ground tiles
+
+// Lb = Large Break, Mb = Medium Break, Sb = Small Break, Vlb = Very Large Break
+// Lt = Left, Rt = Right
+// G = Ground
+// W = Wall
+// Tp = Top
+// Bt = Bottom
+// 32 = 32px hight
+// Dg = Dungeon
+const groundSprites = {
+    tpGDg: {x: 0, y: 0, w: 64, h: 16},
+    btGDg: {x: 64, y: 0, w: 64, h: 16},
+
+    ltGSbDg: {x: 0, y: 16, w: 16, h: 32},
+    ltGMbDg: {x: 16, y: 16, w: 16, h: 32},
+    ltGLbDg: {x: 32, y: 16, w: 16, h: 32},
+    ltGVlbDg: {x: 48, y: 16, w: 16, h: 32},
+
+    rtGVlbDg: {x: 64, y: 16, w: 16, h: 32},
+    rtGLbDg: {x: 80, y: 16, w: 16, h: 32},
+    rtGMbDg: {x: 96, y: 16, w: 16, h: 32},
+    rtGSbDg: {x: 112, y: 16, w: 16, h: 32},
+
+    ltTpGSbDg: {x: 0, y: 48, w: 16, h: 16},
+    ltTpGMbDg: {x: 16, y: 48, w: 16, h: 16},
+    ltTpGLbDg: {x: 32, y: 48, w: 16, h: 16},
+    ltTpGVlbDg: {x: 48, y: 48, w: 16, h: 16},
+
+    rtTpGVlbDg: {x: 64, y: 48, w: 16, h: 16},
+    rtTpGLbDg: {x: 80, y: 48, w: 16, h: 16},
+    rtTpGMbDg: {x: 96, y: 48, w: 16, h: 16},
+    rtTpGSbDg: {x: 112, y: 48, w: 16, h: 16},
+
+    ltTpBtGSbDg: {x: 0, y: 64, w: 16, h: 32},
+    ltTpBtGMbDg: {x: 16, y: 64, w: 16, h: 32},
+    ltTpBtGLbDg: {x: 32, y: 64, w: 16, h: 32},
+    ltTpBtGVlbDg: {x: 48, y: 64, w: 16, h: 32},
+
+    rtTpBtGVlbDg: {x: 64, y: 64, w: 16, h: 32},
+    rtTpBtGLbDg: {x: 80, y: 64, w: 16, h: 32},
+    rtTpBtGMbDg: {x: 96, y: 64, w: 16, h: 32},
+    rtTbBtGSbDg: {x: 112, y: 64, w: 16, h: 32},
+
+    ltBtGSbDg: {x: 0, y: 96, w: 16, h: 16},
+    ltBtGMbDg: {x: 16, y: 96, w: 16, h: 16},
+    ltBtGLbDg: {x: 32, y: 96, w: 16, h: 16},
+    ltBtGVlbDg: {x: 48, y: 96, w: 16, h: 16},
+
+    rtBtGVlbDg: {x: 64, y: 96, w: 16, h: 16},
+    rtBtGLbDg: {x: 80, y: 96, w: 16, h: 16},
+    rtBtGMbDg: {x: 96, y: 96, w: 16, h: 16},
+    rtBtGSbDg: {x: 112, y: 96, w: 16, h: 16},
+}
+
+function drawDungeonSprite(name, x, y) {
+    const s = groundSprites[name];
+    if (!s) {
+        console.error("Unknown sprite:", name);
+        return;
+    }
+
+    const el = document.createElement("div");
+    el.classList.add("sprite");
+
+    el.style.width = s.w + "px";
+    el.style.height = s.h + "px";
+
+    el.style.backgroundImage = "url('sprites/dungeonAssets/decorative_cracks_floor.png')";
+    el.style.backgroundPosition = `-${s.x}px -${s.y}px`;
+
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+
+    document.getElementById("background").appendChild(el);
+}
+
+
+drawDungeonSprite("rtGSbDg", 64, 48);
+drawDungeonSprite("ltGSbDg", 0, 0);
+drawDungeonSprite("rtGSbDg", 64, 0);
+drawDungeonSprite("tpGDg", 128, 112);
+drawDungeonSprite("tpGDg", 100, 112);
+drawDungeonSprite("ltGSbDg", 0, 100);
+drawDungeonSprite("ltBtGSbDg", 0, 166);
+drawDungeonSprite("btGDg", 128, 166);
+drawDungeonSprite("btGDg", 64, 166);
+
+
+
+
+
+    // Passable ground tiles
+
+    // Impassable ground tiles
+
+    // Trap ground tiles
+
+    // Interactive ground tiles
+
+// Wall tiles
+
+    // Passable wall tiles
+
+    // Impassable wall tiles
+
+    // Trap wall tiles
+
+    // Interactive wall tiles
+
+
+// Full background
