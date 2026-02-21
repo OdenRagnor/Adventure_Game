@@ -174,8 +174,8 @@ function setIdleDirection(direction) {
 }
 
 
-let playerX = 300; // starting pixel position
-let playerY = 300;
+let playerX = 1350; // starting pixel position
+let playerY = 1400;
 const playerSpeed = 4;
 
 //setIdleDirection(lastDirection);
@@ -202,31 +202,43 @@ document.addEventListener("keyup", (e) => {
     if (keys[e.key] !== undefined) keys[e.key] = false;
 });
 
+const TILE_SCALE = 4;
+const PLAYER_SCALE = 2;
+
+
 let cameraX = 0;
 let cameraY = 0;
 
 function gameLoop(timestamp) {
-    let moving = false;
+    let dx = 0;
+    let dy = 0;
 
-    if (keys.ArrowUp || keys.w) {
-        playerY -= playerSpeed;
-        setIdleDirection("up");
-        moving = true;
-    }
-    if (keys.ArrowDown || keys.s) {
-        playerY += playerSpeed;
-        setIdleDirection("down");
-        moving = true;
-    }
-    if (keys.ArrowLeft || keys.a) {
-        playerX -= playerSpeed;
-        setIdleDirection("left");
-        moving = true;
-    }
-    if (keys.ArrowRight || keys.d) {
-        playerX += playerSpeed;
-        setIdleDirection("right");
-        moving = true;
+    // Collect movement input
+    if (keys.w || keys.ArrowUp)    dy -= 1;
+    if (keys.s || keys.ArrowDown)  dy += 1;
+    if (keys.a || keys.ArrowLeft)  dx -= 1;
+    if (keys.d || keys.ArrowRight) dx += 1;
+
+    // Set idle direction based on last pressed key
+    if (dy < 0) setIdleDirection("up");
+    else if (dy > 0) setIdleDirection("down");
+    else if (dx < 0) setIdleDirection("left");
+    else if (dx > 0) setIdleDirection("right");
+
+    // Normalize diagonal movement
+    if (dx !== 0 || dy !== 0) {
+        const length = Math.sqrt(dx * dx + dy * dy);
+        dx /= length;
+        dy /= length;
+
+        const nextX = playerX + dx * playerSpeed;
+        const nextY = playerY + dy * playerSpeed;
+
+        // Collision check
+        if (isTileAt(nextX, nextY)) {
+            playerX = nextX;
+            playerY = nextY;
+        }
     }
 
     // CAMERA FOLLOWS PLAYER
@@ -236,11 +248,11 @@ function gameLoop(timestamp) {
     background.style.left = -cameraX + "px";
     background.style.top = -cameraY + "px";
 
-    // IDLE ANIMATION
     updateIdleAnimation(timestamp);
-
     requestAnimationFrame(gameLoop);
 }
+
+
 
 requestAnimationFrame(gameLoop);
 
@@ -302,6 +314,7 @@ const groundSprites = {
 
 function drawDungeonSprite(name, x, y) {
     const s = groundSprites[name];
+
     if (!s) {
         console.error("Unknown sprite:", name);
         return;
@@ -319,19 +332,50 @@ function drawDungeonSprite(name, x, y) {
     el.style.left = x + "px";
     el.style.top = y + "px";
 
+    el.dataset.x = x;
+    el.dataset.y = y;
+    el.dataset.w = s.w;
+    el.dataset.h = s.h;
+
     document.getElementById("background").appendChild(el);
 }
 
+function isTileAt(x, y) {
+    const tiles = document.querySelectorAll("#background .sprite");
 
-drawDungeonSprite("rtGSbDg", 64, 48);
-drawDungeonSprite("ltGSbDg", 0, 0);
-drawDungeonSprite("rtGSbDg", 64, 0);
-drawDungeonSprite("tpGDg", 128, 112);
-drawDungeonSprite("tpGDg", 100, 112);
-drawDungeonSprite("ltGSbDg", 0, 100);
-drawDungeonSprite("ltBtGSbDg", 0, 166);
-drawDungeonSprite("btGDg", 128, 166);
-drawDungeonSprite("btGDg", 64, 166);
+    for (const tile of tiles) {
+        const tx = parseInt(tile.dataset.x);
+        const ty = parseInt(tile.dataset.y);
+
+        // Apply scale(4)
+        const tw = parseInt(tile.dataset.w) * TILE_SCALE;
+        const th = parseInt(tile.dataset.h) * TILE_SCALE;
+
+        if (
+            x >= tx && x < tx + tw &&
+            y >= ty && y < ty + th
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
+
+
+
+drawDungeonSprite("rtGSbDg", 1364, 1348);
+drawDungeonSprite("ltGSbDg", 1300, 1300);
+drawDungeonSprite("rtGSbDg", 1364, 1300);
+drawDungeonSprite("tpGDg", 1428, 1412);
+drawDungeonSprite("tpGDg", 1400, 1412);
+drawDungeonSprite("ltGSbDg", 1300, 1400);
+drawDungeonSprite("ltBtGSbDg", 1300, 1466);
+drawDungeonSprite("btGDg", 1428, 1466);
+drawDungeonSprite("btGDg", 1364, 1466);
 
 
 

@@ -83,7 +83,7 @@ html, body {
     height: 64px;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) scale(2);
+    transform: translate(-50%, calc(-50% - 22px)) scale(2);
     background-image: url("sprites/swordsMan/Swordsman_lvl3_Idle_without_shadow.png");
     background-repeat: no-repeat;
     image-rendering: pixelated;
