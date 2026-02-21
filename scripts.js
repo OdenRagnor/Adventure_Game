@@ -174,8 +174,8 @@ function setIdleDirection(direction) {
 }
 
 
-let playerX = 1350; // starting pixel position
-let playerY = 1400;
+let playerX = 21350; // starting pixel position
+let playerY = 21400;
 const playerSpeed = 4;
 
 //setIdleDirection(lastDirection);
@@ -366,18 +366,42 @@ function isTileAt(x, y) {
 
 
 
-
-drawDungeonSprite("rtGSbDg", 1364, 1348);
-drawDungeonSprite("ltGSbDg", 1300, 1300);
-drawDungeonSprite("rtGSbDg", 1364, 1300);
-drawDungeonSprite("tpGDg", 1428, 1412);
-drawDungeonSprite("tpGDg", 1400, 1412);
-drawDungeonSprite("ltGSbDg", 1300, 1400);
-drawDungeonSprite("ltBtGSbDg", 1300, 1466);
-drawDungeonSprite("btGDg", 1428, 1466);
-drawDungeonSprite("btGDg", 1364, 1466);
+// Start area
+drawDungeonSprite("rtGSbDg", 21364, 21348);
+drawDungeonSprite("ltGSbDg", 21300, 21300);
+drawDungeonSprite("rtGSbDg", 21364, 21300);
 
 
+// first left
+drawDungeonSprite("tpGDg", 21428, 21412);
+drawDungeonSprite("tpGDg", 21400, 21412);
+drawDungeonSprite("ltGSbDg", 21300, 21400);
+drawDungeonSprite("ltBtGSbDg", 21300, 21466);
+drawDungeonSprite("btGDg", 21428, 21466);
+drawDungeonSprite("btGDg", 21364, 21466);
+
+drawDungeonSprite("tpGDg", 21684, 21412);
+drawDungeonSprite("btGDg", 21684, 21466);
+
+drawDungeonSprite("tpGDg", 21940, 21412);
+drawDungeonSprite("btGDg", 21940, 21466);
+
+
+// second left
+drawDungeonSprite("ltGSbDg", 21492, 21300);
+drawDungeonSprite("rtGSbDg", 21556, 21300);
+drawDungeonSprite("ltGSbDg", 21492, 21304);
+drawDungeonSprite("rtGSbDg", 21556, 21304);
+drawDungeonSprite("ltGSbDg", 21492, 21172);
+drawDungeonSprite("rtGSbDg", 21556, 21172);
+
+// third left
+drawDungeonSprite("ltGSbDg", 21940, 21300);
+drawDungeonSprite("rtGSbDg", 22004, 21300);
+drawDungeonSprite("ltGSbDg", 21940, 21304);
+drawDungeonSprite("rtGSbDg", 22004, 21304);
+drawDungeonSprite("ltGSbDg", 21940, 21172);
+drawDungeonSprite("rtGSbDg", 22004, 21172);
 
 
 
