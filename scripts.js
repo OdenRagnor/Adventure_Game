@@ -397,12 +397,28 @@ drawDungeonSprite("rtGSbDg", 21556, 21172);
 
 // third left
 drawDungeonSprite("ltGSbDg", 21940, 21300);
-drawDungeonSprite("rtGSbDg", 22004, 21300);
 drawDungeonSprite("ltGSbDg", 21940, 21304);
-drawDungeonSprite("rtGSbDg", 22004, 21304);
 drawDungeonSprite("ltGSbDg", 21940, 21172);
+
+drawDungeonSprite("rtGSbDg", 22004, 21300);
+drawDungeonSprite("rtGSbDg", 22004, 21304);
 drawDungeonSprite("rtGSbDg", 22004, 21172);
 
+drawDungeonSprite("rtGSbDg", 22040, 21300);
+drawDungeonSprite("rtGSbDg", 22040, 21304);
+drawDungeonSprite("rtGSbDg", 22040, 21172);
+
+drawDungeonSprite("rtGSbDg", 22076, 21300);
+drawDungeonSprite("rtGSbDg", 22076, 21304);
+drawDungeonSprite("rtGSbDg", 22076, 21172);
+
+drawDungeonSprite("rtGSbDg", 22102, 21300);
+drawDungeonSprite("rtGSbDg", 22102, 21304);
+drawDungeonSprite("rtGSbDg", 22102, 21172);
+
+drawDungeonSprite("rtGSbDg", 22138, 21300);
+drawDungeonSprite("rtGSbDg", 22138, 21304);
+drawDungeonSprite("rtGSbDg", 22138, 21172);
 
 
     // Passable ground tiles
