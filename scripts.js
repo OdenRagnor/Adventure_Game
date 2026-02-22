@@ -371,6 +371,16 @@ drawDungeonSprite("rtGSbDg", 21364, 21348);
 drawDungeonSprite("ltGSbDg", 21300, 21300);
 drawDungeonSprite("rtGSbDg", 21364, 21300);
 
+// Top line
+drawDungeonSprite("tpGDg", 21492, 21074);
+drawDungeonSprite("btGDg", 21492, 21128);
+
+
+drawDungeonSprite("tpGDg", 21684, 21074);
+drawDungeonSprite("btGDg", 21684, 21128);
+
+drawDungeonSprite("tpGDg", 21940, 21074);
+drawDungeonSprite("btGDg", 21940, 21128);
 
 // first left
 drawDungeonSprite("tpGDg", 21428, 21412);
@@ -419,6 +429,10 @@ drawDungeonSprite("rtGSbDg", 22102, 21172);
 drawDungeonSprite("rtGSbDg", 22138, 21300);
 drawDungeonSprite("rtGSbDg", 22138, 21304);
 drawDungeonSprite("rtGSbDg", 22138, 21172);
+
+
+
+
 
 
     // Passable ground tiles
