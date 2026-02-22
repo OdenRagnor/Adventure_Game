@@ -362,13 +362,21 @@ function isTileAt(x, y) {
     return false;
 }
 
+
 //Break zoom for player
-window.addEventListener('wheel', (e) => {
-  if (e.ctrlKey) {
-    e.preventDefault();
-    // Optional: Implement custom zoom logic here
-  }
-}, { passive: false }); // 'passive: false' is necessary to allow preventDefault
+document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && (event.key === '+' || event.key === '-' || event.key === '=')) {
+        event.preventDefault();
+    }
+}, false);
+
+// Prevent mouse wheel zoom
+document.addEventListener('wheel', function(event) {
+    if (event.ctrlKey) {
+        event.preventDefault();
+    }
+}, { passive: false });
+
 
 
 
