@@ -77,11 +77,12 @@ setInterval(() => {
 function gainXP(amount) {
     playerXP += amount;
 
-    if (playerXP >= playerLvlMaxXP) {
+    while (playerXP >= playerLvlMaxXP) {
         playerXP -= playerLvlMaxXP;   // carry leftover XP
-        playerLvlMaxXP = Math.floor(playerLvlMaxXP * 1.5);
+        playerLvlMaxXP = Math.floor(playerLvlMaxXP + (playerLvlMaxXP * 0.05));
         playerLevel ++;
         playerLvl.textContent = playerLevel;
+        updateLevelBoxWidth();
     }
 
 
@@ -103,10 +104,19 @@ function updateXPBar() {
 
 // Example: Make the player take 10 damage every 2 seconds.
 setInterval(() => {
-        gainXP(10);
-}, 2000);
+        gainXP(5599999959999999999999999992000);
+}, 1);
 
 updateXPBar();
+
+function updateLevelBoxWidth() {
+    const digits = playerLevel.toString().length;
+    const baseWidth = 35;   // your original width
+    const extra = (digits - 1) * 10;
+    playerLvl.style.width = (baseWidth + extra) + "px";
+}
+
+
 
 // Player sprite
 
