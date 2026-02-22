@@ -247,26 +247,17 @@ function updateAnimation(timestamp) {
 
 let playerX = 21372;
 let playerY = 21316; // 21364 - 48
-const playerSpeed = 4;
+let playerSpeed = 4;
+const runMultiplier = 1.1;
 
-const keys = {
-    ArrowUp: false,
-    ArrowDown: false,
-    ArrowLeft: false,
-    ArrowRight: false,
-    w: false,
-    a: false,
-    s: false,
-    d: false,
-    Shift: false
-};
+const keys = {};
 
-document.addEventListener("keydown", (e) => {
-    if (keys[e.key] !== undefined) keys[e.key] = true;
+document.addEventListener("keydown", e => {
+    keys[e.code] = true;
 });
 
-document.addEventListener("keyup", (e) => {
-    if (keys[e.key] !== undefined) keys[e.key] = false;
+document.addEventListener("keyup", e => {
+    keys[e.code] = false;
 });
 
 let cameraX = 0;
@@ -278,10 +269,20 @@ function gameLoop(timestamp) {
     dx = 0;
     dy = 0;
     // Movement input
-    if (keys.w || keys.ArrowUp)    dy -= 1;
-    if (keys.s || keys.ArrowDown)  dy += 1;
-    if (keys.a || keys.ArrowLeft)  dx -= 1;
-    if (keys.d || keys.ArrowRight) dx += 1;
+    if (keys["KeyW"]) dy = -1;
+    if (keys["KeyS"]) dy = 1;
+    if (keys["KeyA"]) dx = -1;
+    if (keys["KeyD"]) dx = 1;
+
+    if (keys["ShiftLeft"] || keys["ShiftRight"]) {
+        playerSpeed = playerSpeed * runMultiplier;
+        if (playerSpeed > (4 * 1.5)) {
+            playerSpeed = (4 * 1.5);
+        } 
+    }
+    else {
+            playerSpeed = 4;
+    }
 
     // Direction
     if (dy < 0) setDirection("up");
@@ -289,10 +290,11 @@ function gameLoop(timestamp) {
     else if (dx < 0) setDirection("left");
     else if (dx > 0) setDirection("right");
 
+    
     // State
     if (dx === 0 && dy === 0) {
         setPlayerState("idle");
-    } else if (keys.Shift) {
+    } else if (keys["ShiftLeft"] || keys["ShiftRight"]) {
         setPlayerState("run");
     } else {
         setPlayerState("walk");
@@ -304,8 +306,8 @@ function gameLoop(timestamp) {
         dx /= len;
         dy /= len;
 
-        const nextX = playerX + dx * playerSpeed;
-        const nextY = playerY + dy * playerSpeed;
+        let nextX = playerX + dx * playerSpeed;
+        let nextY = playerY + dy * playerSpeed;
 
         if (isTileAt(nextX, nextY)) {
             playerX = nextX;
@@ -417,7 +419,7 @@ function isTileAt(x, y) {
 
     // Check player's feet instead of center
     const px = x;
-    const py = y + 48; // adjust if needed
+    const py = y + 22; // adjust if needed
 
     for (const tile of tiles) {
         const tx = parseInt(tile.dataset.x);
