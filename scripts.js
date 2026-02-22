@@ -5,6 +5,9 @@ const maxHealth = 100;
 let playerXP = 0;
 let playerLvlMaxXP = 100;
 
+let playerLevel = 1;
+
+const playerLvl = document.getElementById("playerLvl");
 
 // --- Element Selections ---
 // Thanks to 'defer', we can safely do this at the top level.
@@ -26,9 +29,7 @@ if (!healthBarFill) {
 function updateHealthBar() {
     // Make sure we don't try to update a missing element.
     if (!healthBarFill) return;
-
     const healthPercentage = (playerHealth / maxHealth) * 100;
-
     // Set the width of the inner fill div.
     healthBarFill.style.width = Math.max(0, healthPercentage) + '%';
 
@@ -79,6 +80,8 @@ function gainXP(amount) {
     if (playerXP >= playerLvlMaxXP) {
         playerXP -= playerLvlMaxXP;   // carry leftover XP
         playerLvlMaxXP = Math.floor(playerLvlMaxXP * 1.5);
+        playerLevel ++;
+        playerLvl.textContent = playerLevel;
     }
 
 

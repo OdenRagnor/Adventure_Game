@@ -58,6 +58,25 @@ html, body {
     border-radius: 0px 0px 20px 0px;
 }
 
+#playerLvl {
+    position: absolute;
+    background-color: #747272;
+    border: 2px solid whitesmoke;
+    border-radius: 0px 20px 20px 0px;
+    color: whitesmoke;
+    left: 170px;
+    top: 10px;
+    height: 35px;
+    width: 50px;
+    display: block; 
+    text-align: right; 
+    font-weight: bold; 
+    font-size: x-large;
+    padding-top: 5px;
+    padding-right: 6px;
+    z-index: -1;
+}
+
 #xpBar {
     position: absolute;
     top: 27px;
