@@ -476,7 +476,8 @@ const wallSprites = {
     plainWall: {x: 0, y: 0, w: 64, h: 16, walkable: false},
     plainWall2: {x: 64, y: 0, w: 64, h: 32, walkable: false},
     wallCrackedTall: {x: 0, y: 224, w: 32, h: 48, walkable: false},
-    wallBetweenfull: {x: 48, y: 16, w: 32, h: 80, walkable: false}
+    wallBetweenfull: {x: 48, y: 16, w: 32, h: 80, walkable: false},
+    tpHalfWallBetweenfull: {x: 48, y: 16, w: 32, h: 35, walkable: false}
 }
 
 
@@ -649,7 +650,13 @@ drawDungeonSprite("rtGSbDg", 21556, 21304);
 drawDungeonSprite("ltGSbDg", 21492, 21172);
 drawDungeonSprite("rtGSbDg", 21556, 21172);
 
-drawDungeonSprite("wallBetweenfull", 21392, 21110, false);
+drawDungeonSprite("wallBetweenfull", 21392, 21110);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 21030);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20970);
+
+drawDungeonSprite("wallBetweenfull", 21192, 21285);
+drawDungeonSprite("tpHalfWallBetweenfull", 21192, 21205);
+drawDungeonSprite("tpHalfWallBetweenfull", 21192, 21145);
 
 // third left
 drawDungeonSprite("ltGSbDg", 21940, 21300);
