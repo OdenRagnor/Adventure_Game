@@ -177,6 +177,10 @@ setInterval(() => {
             (keys["KeyW"] || keys["KeyS"] || keys["KeyA"] || keys["KeyD"])) {
 
             lowerStamina(5);
+        } 
+        
+        if (isAttacking === true) {
+            lowerStamina(7);
         }
     }
 
@@ -319,6 +323,24 @@ const animations = {
     }
 };
 
+//Attack animation
+
+let isAttacking = false;
+
+function startAttack() {
+    if (isAttacking) return; // prevents spamming
+    if (playerStamina === 0) return;
+    
+    isAttacking = true;
+    setPlayerState("attack");
+    
+    // Attack animation lasts 6 frames × 80ms = 480ms
+    setTimeout(() => {
+        isAttacking = false;
+        setPlayerState("idle");
+    }, 480);
+}
+
 const playerElement = document.getElementById("player");
 
 function setPlayerState(newState) {
@@ -385,6 +407,16 @@ function gameLoop(timestamp) {
     
     if (gamePaused) return;
 
+    
+    if (keys["Space"]){
+        startAttack();
+    }
+
+    if (isAttacking) {
+        dx = 0;
+        dy = 0;
+    }
+
     dx = 0;
     dy = 0;
     // Movement input
@@ -409,7 +441,9 @@ function gameLoop(timestamp) {
 
     
     // State
-    if (dx === 0 && dy === 0) {
+    if (isAttacking) {
+        setPlayerState("attack");
+    } else if (dx === 0 && dy === 0) {
         setPlayerState("idle");
     } else if (keys["ShiftLeft"] || keys["ShiftRight"]) {
         setPlayerState("run");
