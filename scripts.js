@@ -472,8 +472,15 @@ const groundSprites = {
     rtBtGSbDg: {x: 112, y: 96, w: 16, h: 16},
 }
 
+const wallSprites = {
+    plainWall: {x: 0, y: 0, w: 64, h: 16, walkable: false},
+    plainWall2: {x: 64, y: 0, w: 64, h: 16, walkable: false},
+    wallCrackedTall: {x: 0, y: 224, w: 32, h: 32, walkable: false}
+}
+
+
 function drawDungeonSprite(name, x, y) {
-    const s = groundSprites[name];
+    const s = groundSprites[name] || wallSprites[name];
 
     if (!s) {
         console.error("Unknown sprite:", name);
@@ -486,7 +493,46 @@ function drawDungeonSprite(name, x, y) {
     el.style.width = s.w + "px";
     el.style.height = s.h + "px";
 
-    el.style.backgroundImage = "url('sprites/dungeonAssets/decorative_cracks_floor.png')";
+    const isWall = wallSprites[name] !== undefined;
+    el.dataset.walkable = isWall ? "false" : "true";
+    el.style.backgroundImage = isWall
+        ? "url('sprites/dungeonAssets/decorative_cracks_walls.png')"
+        : "url('sprites/dungeonAssets/decorative_cracks_floor.png')";
+
+    el.style.backgroundPosition = `-${s.x}px -${s.y}px`;
+
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+
+    // store collision info
+    el.dataset.x = x;
+    el.dataset.y = y;
+    el.dataset.w = s.w;
+    el.dataset.h = s.h;
+
+    document.getElementById("background").appendChild(el);
+}
+
+/*function drawDungeonSprite(name, x, y) {
+    const s = groundSprites[name] || wallSprites[name];
+    
+    if (!s) {
+        console.error("Unknown sprite:", name);
+        return;
+    }
+
+    const el = document.createElement("div");
+    el.classList.add("sprite");
+
+    el.style.width = s.w + "px";
+    el.style.height = s.h + "px";
+
+    // Choose the correct PNG depending on which set it came from
+    const isWall = wallSprites[name] !== undefined;
+    el.style.backgroundImage = isWall
+        ? "url('sprites/dungeonAssets/decorative_cracks_Walls.png')"
+        : "url('sprites/dungeonAssets/decorative_cracks_floor.png')";
+
     el.style.backgroundPosition = `-${s.x}px -${s.y}px`;
 
     el.style.left = x + "px";
@@ -498,7 +544,7 @@ function drawDungeonSprite(name, x, y) {
     el.dataset.h = s.h;
 
     document.getElementById("background").appendChild(el);
-}
+}*/
 
 function isTileAt(x, y) {
     const tiles = document.querySelectorAll("#background .sprite");
@@ -516,11 +562,11 @@ function isTileAt(x, y) {
         const tw = parseInt(tile.dataset.w) * SCALE;
         const th = parseInt(tile.dataset.h) * SCALE;
 
-        if (
+        const inside = 
             px >= tx && px < tx + tw &&
             py >= ty && py < ty + th
-        ) {
-            return true;
+        if (inside) {
+            return tile.dataset.walkable === "true";
         }
     }
 
@@ -546,7 +592,9 @@ document.addEventListener('wheel', function(event) {
 
 
 // Start area
+
 drawDungeonSprite("rtGSbDg", 21364, 21348);
+drawDungeonSprite("wallCrackedTall", 21298, 21172)
 drawDungeonSprite("ltGSbDg", 21300, 21300);
 drawDungeonSprite("rtGSbDg", 21364, 21300);
 
