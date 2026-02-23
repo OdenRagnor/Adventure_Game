@@ -244,8 +244,6 @@ function updateLevelBoxWidth() {
     playerLvl.style.width = (baseWidth + extra) + "px";
 }
 
-
-
 // Player sprite system
 
 let dx = 0;
@@ -352,6 +350,7 @@ let cameraY = 0;
 function gameLoop(timestamp) {
     
     if (gamePaused) return;
+
     dx = 0;
     dy = 0;
     // Movement input
