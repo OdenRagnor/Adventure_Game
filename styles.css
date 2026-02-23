@@ -36,7 +36,7 @@ html, body {
     border-radius: 0px 20px 0px 0px;
 }
 
-#staminaBar {
+#manaBar {
     position: absolute;
     top: 36px;
     left: 37px;
@@ -48,7 +48,7 @@ html, body {
     border-radius: 0px 0px 20px 0px;
 }
 
-#staminaBarFill {
+#manaBarFill {
     position: absolute;
     width: 100%;
     height: 100%;

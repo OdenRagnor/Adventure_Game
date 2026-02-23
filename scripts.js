@@ -1,19 +1,26 @@
 // --- Global Variables ---
-let playerHealth = 100;
-const maxHealth = 100;
+let playerHealth = 10;
+let maxHealth = 100;
 
 let playerXP = 0;
 let playerLvlMaxXP = 100;
 
 let playerLevel = 1;
 
+let gamePaused = false;
+
 const playerLvl = document.getElementById("playerLvl");
+
+let playerMana = 10;
+let maxMana = 100;
 
 // --- Element Selections ---
 // Thanks to 'defer', we can safely do this at the top level.
 const healthBarFill = document.getElementById("healthBarFill");
 
 const xpBarFill = document.getElementById("xpBarFill");
+
+const manaBarFill = document.getElementById("manaBarFill");
 
 // It's still good practice to check if the element was found.
 if (!healthBarFill) {
@@ -22,6 +29,23 @@ if (!healthBarFill) {
 
 
 // --- Functions ---
+
+
+function goFullscreen() {
+    const elem = document.documentElement; // whole page
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+    }
+}
+
+document.addEventListener("click", function initFullscreen() {
+    goFullscreen();
+    document.removeEventListener("click", initFullscreen);
+});
 
 /**
  * Updates the health bar's visual width based on playerHealth.
@@ -43,11 +67,6 @@ function updateHealthBar() {
 
 }
 
-
-/**
- * A function to simulate taking damage.
- * @param {number} amount - The amount of damage to take.
- */
 function takeDamage(amount) {
     playerHealth -= amount;
 
@@ -61,9 +80,79 @@ function takeDamage(amount) {
 }
 
 
-// --- Initialization and Game Loop ---
-let gamePaused = false;
+function updateHealthBar() {
+    // Make sure we don't try to update a missing element.
+    if (!healthBarFill) return;
+    const healthPercentage = (playerHealth / maxHealth) * 100;
+    // Set the width of the inner fill div.
+    healthBarFill.style.width = Math.max(0, healthPercentage) + '%';
 
+    if (playerHealth <= 30) {
+    healthBarFill.style.backgroundColor = "red";
+    } else if (playerHealth <= 60) {
+        healthBarFill.style.backgroundColor = "orange";
+    } else {
+        healthBarFill.style.backgroundColor = "green";
+    }
+
+}
+
+
+function updateManaBar() {
+    // Make sure we don't try to update a missing element.
+    if (!manaBarFill) return;
+    const manaPercentage = (playerMana / maxMana) * 100;
+    // Set the width of the inner fill div.
+    manaBarFill.style.width = Math.max(0, manaPercentage) + '%';
+
+}
+
+
+
+function loseMana(amount) {
+    playerMana -= amount;
+
+    // Ensure health doesn't go below 0.
+    if (playerMana < 0) {
+        playerMana = 0;
+    }
+
+    console.log("Player mana: ", playerMana);
+    updateManaBar(); // Call the update function.
+}
+
+setInterval(() => {
+    if (!gamePaused) {
+        if ((playerHealth < maxHealth) || (playerMana < maxMana)) {
+            healthRegen(1);
+            manaRegen(2);
+        } 
+    }
+}, 2000);
+
+function healthRegen(amount) {
+    playerHealth += amount;
+
+    // Ensure health doesn't go below 0.
+    if (playerHealth > maxHealth) {
+        playerHealth = maxHealth;
+    }
+
+    console.log("Player health: ", playerHealth);
+    updateHealthBar(); // Call the update function.
+}
+
+function manaRegen(amount) {
+    playerMana += amount;
+
+    if (playerMana > maxMana) {
+        playerMana = maxMana;
+    }
+    updateManaBar(); 
+}
+
+updateManaBar();
+updateHealthBar();
 // Set the initial visual state of the health bar.
 
 function death() {
@@ -99,8 +188,6 @@ function death() {
 }
 
 
-updateHealthBar();
-
 // Example: Make the player take 10 damage every 2 seconds.
 /*setInterval(() => {
     if (!gamePaused) {
@@ -113,8 +200,7 @@ updateHealthBar();
     }
 
 
-}, 2000);*/
-
+}, 2000)*/
 
 function gainXP(amount) {
     playerXP += amount;
@@ -323,6 +409,7 @@ function gameLoop(timestamp) {
     background.style.top = -cameraY + "px";
 
     updateAnimation(timestamp);
+    goFullscreen();
     requestAnimationFrame(gameLoop);
 }
 
