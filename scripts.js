@@ -474,8 +474,8 @@ const groundSprites = {
 
 const wallSprites = {
     plainWall: {x: 0, y: 0, w: 64, h: 16, walkable: false},
-    plainWall2: {x: 64, y: 0, w: 64, h: 16, walkable: false},
-    wallCrackedTall: {x: 0, y: 224, w: 32, h: 32, walkable: false},
+    plainWall2: {x: 64, y: 0, w: 64, h: 32, walkable: false},
+    wallCrackedTall: {x: 0, y: 224, w: 32, h: 48, walkable: false},
     wallBetweenfull: {x: 48, y: 16, w: 32, h: 80, walkable: false}
 }
 
@@ -608,9 +608,11 @@ document.addEventListener('wheel', function(event) {
 // Start area
 
 drawDungeonSprite("rtGSbDg", 21364, 21348);
-drawDungeonSprite("wallCrackedTall", 21298, 21172)
+
 drawDungeonSprite("ltGSbDg", 21300, 21300);
 drawDungeonSprite("rtGSbDg", 21364, 21300);
+
+drawDungeonSprite("wallCrackedTall", 21298, 21140)
 
 // Top line
 drawDungeonSprite("tpGDg", 21492, 21074);
