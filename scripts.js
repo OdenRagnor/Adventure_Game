@@ -475,7 +475,8 @@ const groundSprites = {
 const wallSprites = {
     plainWall: {x: 0, y: 0, w: 64, h: 16, walkable: false},
     plainWall2: {x: 64, y: 0, w: 64, h: 16, walkable: false},
-    wallCrackedTall: {x: 0, y: 224, w: 32, h: 32, walkable: false}
+    wallCrackedTall: {x: 0, y: 224, w: 32, h: 32, walkable: false},
+    wallBetweenfull: {x: 48, y: 16, w: 32, h: 80, walkable: false}
 }
 
 
@@ -549,9 +550,10 @@ function drawDungeonSprite(name, x, y) {
 function isTileAt(x, y) {
     const tiles = document.querySelectorAll("#background .sprite");
 
-    // Check player's feet instead of center
     const px = x;
-    const py = y + 22; // adjust if needed
+    const py = y + 22;
+
+    let foundWalkable = false;
 
     for (const tile of tiles) {
         const tx = parseInt(tile.dataset.x);
@@ -562,14 +564,26 @@ function isTileAt(x, y) {
         const tw = parseInt(tile.dataset.w) * SCALE;
         const th = parseInt(tile.dataset.h) * SCALE;
 
-        const inside = 
+        const inside =
             px >= tx && px < tx + tw &&
-            py >= ty && py < ty + th
+            py >= ty && py < ty + th;
+
         if (inside) {
-            return tile.dataset.walkable === "true";
+            const walkable = tile.dataset.walkable === "true";
+
+            if (!walkable) {
+                // ⭐ NON-WALKABLE TILE WINS
+                return false;
+            }
+
+            foundWalkable = true;
         }
     }
 
+    // If we found at least one walkable tile and no walls
+    if (foundWalkable) return true;
+
+    // Nothing under feet = not walkable
     return false;
 }
 
@@ -617,6 +631,7 @@ drawDungeonSprite("ltBtGSbDg", 21300, 21466);
 drawDungeonSprite("btGDg", 21428, 21466);
 drawDungeonSprite("btGDg", 21364, 21466);
 
+
 drawDungeonSprite("tpGDg", 21684, 21412);
 drawDungeonSprite("btGDg", 21684, 21466);
 
@@ -631,6 +646,8 @@ drawDungeonSprite("ltGSbDg", 21492, 21304);
 drawDungeonSprite("rtGSbDg", 21556, 21304);
 drawDungeonSprite("ltGSbDg", 21492, 21172);
 drawDungeonSprite("rtGSbDg", 21556, 21172);
+
+drawDungeonSprite("wallBetweenfull", 21392, 21110, false);
 
 // third left
 drawDungeonSprite("ltGSbDg", 21940, 21300);
