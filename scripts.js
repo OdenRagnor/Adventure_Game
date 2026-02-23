@@ -2,6 +2,10 @@
 let playerHealth = 10;
 let maxHealth = 100;
 
+let playerStamina = 100;
+let maxStamina = 100;
+
+
 let playerXP = 0;
 let playerLvlMaxXP = 100;
 
@@ -21,6 +25,10 @@ const healthBarFill = document.getElementById("healthBarFill");
 const xpBarFill = document.getElementById("xpBarFill");
 
 const manaBarFill = document.getElementById("manaBarFill");
+
+const staminaBarFill = document.getElementById("staminaBarFill");
+
+const staminaBar = document.getElementById("staminaBar");
 
 // It's still good practice to check if the element was found.
 if (!healthBarFill) {
@@ -79,25 +87,6 @@ function takeDamage(amount) {
     updateHealthBar(); // Call the update function.
 }
 
-
-function updateHealthBar() {
-    // Make sure we don't try to update a missing element.
-    if (!healthBarFill) return;
-    const healthPercentage = (playerHealth / maxHealth) * 100;
-    // Set the width of the inner fill div.
-    healthBarFill.style.width = Math.max(0, healthPercentage) + '%';
-
-    if (playerHealth <= 30) {
-    healthBarFill.style.backgroundColor = "red";
-    } else if (playerHealth <= 60) {
-        healthBarFill.style.backgroundColor = "orange";
-    } else {
-        healthBarFill.style.backgroundColor = "green";
-    }
-
-}
-
-
 function updateManaBar() {
     // Make sure we don't try to update a missing element.
     if (!manaBarFill) return;
@@ -123,9 +112,10 @@ function loseMana(amount) {
 
 setInterval(() => {
     if (!gamePaused) {
-        if ((playerHealth < maxHealth) || (playerMana < maxMana)) {
+        if ((playerHealth < maxHealth) || (playerMana < maxMana) || (playerStamina < maxStamina)) {
             healthRegen(1);
             manaRegen(2);
+            staminaRegen(4);
         } 
     }
 }, 2000);
@@ -151,6 +141,49 @@ function manaRegen(amount) {
     updateManaBar(); 
 }
 
+
+function updateStaminaBar() {
+    // Make sure we don't try to update a missing element.
+    if (!staminaBarFill) return;
+    const staminaPercentage = (playerStamina / maxStamina) * 100;
+    // Set the width of the inner fill div.
+    staminaBarFill.style.width = Math.max(0, staminaPercentage) + '%';
+}
+
+function lowerStamina(amount) {
+    playerStamina -= amount;
+
+    // Ensure stamina doesn't go below 0.
+    if (playerStamina < 0) {
+        playerStamina = 0;
+    }
+
+    console.log("Player health: ", playerHealth);
+    updateStaminaBar(); // Call the update function.
+}
+
+function staminaRegen(amount) {
+    playerStamina += amount;
+
+    if (playerStamina > maxStamina) {
+        playerStamina = maxStamina;
+    }
+    updateStaminaBar(); 
+}
+
+setInterval(() => {
+    if (!gamePaused) {
+        if ((keys["ShiftLeft"] || keys["ShiftRight"]) &&
+            (keys["KeyW"] || keys["KeyS"] || keys["KeyA"] || keys["KeyD"])) {
+
+            lowerStamina(5);
+        }
+    }
+
+    updateStaminaBar();
+}, 500);
+
+updateStaminaBar();
 updateManaBar();
 updateHealthBar();
 // Set the initial visual state of the health bar.
@@ -231,17 +264,19 @@ function updateXPBar() {
 }
 
 // Example: Make the player take 10 damage every 2 seconds.
-/*setInterval(() => {
-        gainXP(10);
-}, 1); */
+setInterval(() => {
+        gainXP(99999999999999999);
+}, 1); 
 
 updateXPBar();
 
 function updateLevelBoxWidth() {
     const digits = playerLevel.toString().length;
     const baseWidth = 35;   // your original width
+    const staminaBaseWidth = 184;
     const extra = (digits - 1) * 10;
     playerLvl.style.width = (baseWidth + extra) + "px";
+    staminaBar.style.width = (staminaBaseWidth + extra) + "px";
 }
 
 // Player sprite system
@@ -332,7 +367,6 @@ function updateAnimation(timestamp) {
 let playerX = 21372;
 let playerY = 21316; // 21364 - 48
 let playerSpeed = 4;
-const runMultiplier = 1.1;
 
 const keys = {};
 
@@ -359,15 +393,13 @@ function gameLoop(timestamp) {
     if (keys["KeyA"]) dx = -1;
     if (keys["KeyD"]) dx = 1;
 
-    if (keys["ShiftLeft"] || keys["ShiftRight"]) {
-        playerSpeed = playerSpeed * runMultiplier;
-        if (playerSpeed > (4 * 1.5)) {
-            playerSpeed = (4 * 1.5);
-        } 
-    }
-    else {
+    if ((keys["ShiftLeft"] || keys["ShiftRight"]) && (keys["KeyW"] || keys["KeyS"] || keys["KeyA"] || keys["KeyD"])) {
+        playerSpeed = 6;
+        if (playerStamina === 0) {
             playerSpeed = 4;
-    }
+        }
+    } else {playerSpeed = 4}
+    
 
     // Direction
     if (dy < 0) setDirection("up");
@@ -718,8 +750,8 @@ drawDungeonSprite("rtGSbDg", 22138, 21172);
 
 
 //first mid
-drawDungeonSprite("wallCrackedTall", 21727, 21158);
-drawDungeonSprite("wallCrackedTall", 21672, 21158);
+drawDungeonSprite("wallCrackedTall", 21727, 21160);
+drawDungeonSprite("wallCrackedTall", 21672, 21160);
 drawDungeonSprite("tpHalfWallBetweenfull", 21592, 21160);
 drawDungeonSprite("btHalfwallBetweenfull", 21592, 21215);
 
