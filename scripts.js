@@ -584,6 +584,51 @@ function drawDungeonSprite(name, x, y) {
     document.getElementById("background").appendChild(el);
 }
 
+
+//Music
+const townTracks = [
+  new Audio("Music/woodland/woodland1.mp3"),
+  new Audio("Music/woodland/woodland2.mp3"),
+  new Audio("Music/woodland/woodland3.mp3"),
+  new Audio("Music/woodland/woodland4.mp3"),
+  new Audio("Music/woodland/woodland5.mp3"),
+  new Audio("Music/woodland/woodland6.mp3"),
+  new Audio("Music/woodland/woodland7.mp3"),
+  new Audio("Music/woodland/woodland8.mp3"),
+  new Audio("Music/woodland/woodland9.mp3")
+];
+
+// Set shared properties
+townTracks.forEach(track => {
+  track.loop = true;
+  track.volume = 0.5;
+});
+
+function playRandomTownTrack() {
+  // stop all
+  townTracks.forEach(t => {
+    t.pause();
+    t.currentTime = 0;
+  });
+
+  // pick random
+  const track = townTracks[Math.floor(Math.random() * townTracks.length)];
+  track.play();
+
+  return track; // if you want to store which one is playing
+}
+
+let currentTownTrack = playRandomTownTrack();
+
+playRandomTownTrack();
+
+document.addEventListener("click", () => {
+  playRandomTownTrack();
+}, { once: true });
+
+
+
+
 /*function drawDungeonSprite(name, x, y) {
     const s = groundSprites[name] || wallSprites[name];
     
@@ -891,3 +936,6 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22178, 21170);
 
 
 // Full background
+
+
+
