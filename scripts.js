@@ -605,26 +605,38 @@ townTracks.forEach(track => {
 });
 
 function playRandomTownTrack() {
-  // stop all
   townTracks.forEach(t => {
     t.pause();
     t.currentTime = 0;
   });
 
-  // pick random
   const track = townTracks[Math.floor(Math.random() * townTracks.length)];
   track.play();
-
-  return track; // if you want to store which one is playing
+  return track;
 }
 
-let currentTownTrack = playRandomTownTrack();
+let currentTownTrack;
 
-playRandomTownTrack();
-
+// First user click starts music
 document.addEventListener("click", () => {
-  playRandomTownTrack();
+  currentTownTrack = playRandomTownTrack();
 }, { once: true });
+
+// MUSIC TOGGLE BUTTON
+let musicEnabled = true;
+
+document.getElementById("toggleMusic").addEventListener("click", () => {
+  if (musicEnabled) {
+    townTracks.forEach(t => {
+      t.pause();
+      t.currentTime = 0;
+    });
+    musicEnabled = false;
+  } else {
+    currentTownTrack = playRandomTownTrack();
+    musicEnabled = true;
+  }
+});
 
 
 
@@ -938,4 +950,162 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22178, 21170);
 // Full background
 
 
+// ===============================
+// SAVE / LOAD SYSTEM FOR YOUR GAME
+// ===============================
 
+// Download a save file to the player's PC
+function saveToPC(data) {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "MyGameSave.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+  console.log("Save file downloaded");
+}
+
+// Load a save file from the player's PC
+function loadFromPC(callback) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = event => {
+      try {
+        const data = JSON.parse(event.target.result);
+        callback(data);
+        console.log("Save file loaded");
+      } catch (err) {
+        console.error("Invalid save file");
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+}
+
+// ===============================
+// SAVE GAME (your variables)
+// ===============================
+
+function saveGame() {
+  const data = {
+    playerX,
+    playerY,
+    playerSpeed,
+    dx,
+    dy,
+    playerState,
+    direction,
+    playerMana,
+    maxMana,
+    playerHealth,
+    maxHealth,
+    playerStamina,
+    maxStamina,
+    playerXP,
+    playerLvlMaxXP,
+    playerLevel,
+    gamePaused
+  };
+
+  saveToPC(data);
+}
+
+// ===============================
+// LOAD GAME (restore variables)
+// ===============================
+
+function loadGame() {
+
+  // If fullscreen is active, exit it first
+  const wasFullscreen = !!document.fullscreenElement;
+
+  if (wasFullscreen) {
+    document.exitFullscreen();
+  }
+
+  // Now open the file picker safely
+  loadFromPC(data => {
+
+    // Restore your variables
+    playerX = data.playerX;
+    playerY = data.playerY;
+    playerSpeed = data.playerSpeed;
+    dx = data.dx;
+    dy = data.dy;
+    playerState = data.playerState;
+    direction = data.direction;
+    playerMana = data.playerMana;
+    maxMana = data.maxMana;
+    playerHealth = data.playerHealth;
+    maxHealth = data.maxHealth;
+    playerStamina = data.playerStamina;
+    maxStamina = data.maxStamina;
+    playerXP = data.playerXP;
+    playerLvlMaxXP = data.playerLvlMaxXP;
+    playerLevel = data.playerLevel;
+    gamePaused = data.gamePaused;
+
+    console.log("Game state restored");
+
+    // Re-enter fullscreen AFTER loading
+    if (wasFullscreen) {
+      document.documentElement.requestFullscreen();
+    }
+  });
+}
+
+// ===============================
+// OPTIONAL: KEYBINDS
+// ===============================
+
+document.addEventListener("keydown", e => {
+  if (e.key === "k") saveGame(); // Press K to save
+  if (e.key === "l") loadGame(); // Press L to load
+});
+
+// ==========================
+// Menu
+// ==========================
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  const gameMenu = document.getElementById("gameMenu");
+  const closeMenuBtn = document.getElementById("closeMenu");
+
+  function openMenu() {
+    gameMenu.style.display = "block";
+  }
+
+  function closeMenu() {
+    gameMenu.style.display = "none";
+  }
+
+  closeMenuBtn.addEventListener("click", closeMenu);
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "o") {
+      if (gameMenu.style.display === "block") {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", saveGame);
+  document.getElementById("loadBtn").addEventListener("click", loadGame);
+
+});
