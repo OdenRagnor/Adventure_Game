@@ -1139,28 +1139,70 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22178, 21195);
 drawDungeonSprite("tpHalfWallBetweenfull", 22178, 21170);
 
 
-
-    // Passable ground tiles
-
-    // Impassable ground tiles
-
-    // Trap ground tiles
-
-    // Interactive ground tiles
-
-// Wall tiles
-
-    // Passable wall tiles
-
-    // Impassable wall tiles
-
-    // Trap wall tiles
-
-    // Interactive wall tiles
-
-
-// Full background
-
+// first hallway after circle room
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21288, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21288, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21318, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21318, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21348, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21348, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21378, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21378, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21408, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21408, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21438, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21438, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21468, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21468, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21498, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21498, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21528, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21528, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21558, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21558, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21588, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21588, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21618, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21618, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21648, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21648, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21678, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21678, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21708, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21708, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21738, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21738, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21768, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21768, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21798, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21798, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21828, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21828, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21858, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21858, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21888, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21888, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21918, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21918, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21948, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21948, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 21978, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21978, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22008, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22008, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22038, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22038, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22068, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22068, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22098, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22098, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22128, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22128, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22158, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22158, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22188, 20515);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22188, 20570);
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22218, 20515);
 
 // ===============================
 // SAVE / LOAD SYSTEM FOR YOUR GAME
