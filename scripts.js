@@ -431,8 +431,8 @@ function updateAnimation(timestamp) {
 
 // Movement + camera
 
-let playerX = 21372;
-let playerY = 21316; // 21364 - 48
+let playerX = 21370;
+let playerY = 21320; // 21364 - 48
 let playerSpeed = 4;
 
 const keys = {};
@@ -447,6 +447,39 @@ document.addEventListener("keyup", e => {
 
 let cameraX = 0;
 let cameraY = 0;
+
+
+function playerCanMoveTo(x, y) {
+        const ox = x + 8;  // shift hitbox right
+        const oy = y + 8;  // shift hitbox down
+        const w = 16;
+        const h = 16;
+
+        return (
+            isTileAt(ox, oy) &&
+            isTileAt(ox + w, oy) &&
+            isTileAt(ox, oy + h) &&
+            isTileAt(ox + w, oy + h)
+        );
+
+    }
+
+    function monsterCanMoveTo(x, y) {
+        const centerX = x;
+        const centerY = y;
+
+        const ox = centerX + 40; // shift hitbox right
+        const oy = centerY + 40; // shift hitbox down
+        const w = 16;
+        const h = 16;
+
+        return (
+            isTileAt(ox, oy) &&
+            isTileAt(ox + w, oy) &&
+            isTileAt(ox, oy + h) &&
+            isTileAt(ox + w, oy + h)
+        );
+    }
 
 function gameLoop(timestamp) {
     
@@ -505,8 +538,13 @@ function gameLoop(timestamp) {
         let nextX = playerX + dx * playerSpeed;
         let nextY = playerY + dy * playerSpeed;
 
-        if (isTileAt(nextX, nextY)) {
+        // X movement
+        if (!playerWouldHitMonster(nextX, playerY) && playerCanMoveTo(nextX, playerY)) {
             playerX = nextX;
+        }
+
+        // Y movement
+        if (!playerWouldHitMonster(playerX, nextY) && playerCanMoveTo(playerX, nextY)) {
             playerY = nextY;
         }
     }
@@ -521,18 +559,32 @@ function gameLoop(timestamp) {
         }
     }
 
+    
     monsters.forEach(m => {
-        const speed = 1;
+        const speed = 2;
 
         const dx = playerX - m.x;
         const dy = playerY - m.y;
         const len = Math.hypot(dx, dy);
 
-        if (len < 300) {
-            m.x += (dx / len) * speed;
-            m.y += (dy / len) * speed;
-            m.updatePosition();
+        const stepX = (dx / len) * speed;
+        const stepY = (dy / len) * speed;
+
+        const nextX = m.x + stepX;
+        const nextY = m.y + stepY;
+
+        // X movement
+        if (monsterCanMoveTo(nextX, m.y) && !monsterWouldHitPlayer(nextX, m.y)) {
+            m.x = nextX;
         }
+
+        // Y movement
+        if (monsterCanMoveTo(m.x, nextY) && !monsterWouldHitPlayer(m.x, nextY)) {
+            m.y = nextY;
+        }
+
+        m.updatePosition();
+
     });
 
 
@@ -751,11 +803,83 @@ document.getElementById("toggleMusic").addEventListener("click", () => {
     document.getElementById("background").appendChild(el);
 }*/
 
+function getPlayerHitbox() {
+    return {
+        x: playerX + 8,
+        y: playerY + 8,
+        w: 16,
+        h: 16
+    };
+}
+
+function playerWouldHitMonster(nextX, nextY) {
+    const pNext = {
+        x: nextX - 18,
+        y: nextY - 8,
+        w: 16,
+        h: 16
+    };
+
+    const pCur = {
+        x: playerX - 18,
+        y: playerY - 8,
+        w: 16,
+        h: 16
+    };
+
+    // helper to get center
+    function center(box) {
+        return {
+            x: box.x + box.w / 2,
+            y: box.y + box.h / 2
+        };
+    }
+
+    const pCurC = center(pCur);
+    const pNextC = center(pNext);
+
+    for (const m of monsters) {
+        const mBox = {
+            x: m.x + 8,
+            y: m.y + 8,
+            w: 16,
+            h: 16
+        };
+        const mC = center(mBox);
+
+        const distCur = Math.hypot(pCurC.x - mC.x, pCurC.y - mC.y);
+        const distNext = Math.hypot(pNextC.x - mC.x, pNextC.y - mC.y);
+
+        // Only block if:
+        // 1) next position overlaps AND
+        // 2) you're moving CLOSER to the monster
+        if (rectOverlap(pNext, mBox) && distNext < distCur) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function monsterWouldHitPlayer(nextX, nextY) {
+    const playerBox = getPlayerHitbox();
+
+    const monsterBox = {
+        x: nextX + 32,  // same offset you used for monster hitbox
+        y: nextY + 32,
+        w: 16,
+        h: 16
+    };
+
+    return rectOverlap(monsterBox, playerBox);
+}
+
+
 function isTileAt(x, y) {
     const tiles = document.querySelectorAll("#background .sprite");
 
-    const px = x;
-    const py = y + 22;
+    const px = x - 18;
+    const py = y - 8;
 
     let foundWalkable = false;
 
@@ -783,19 +907,6 @@ function isTileAt(x, y) {
             }
 
             foundWalkable = true;
-        }
-    }
-
-    for (const m of monsters) {
-        const mw = 16;
-        const mh = 16;
-
-        const inside = 
-            x >= m.x && x < m.x + mw &&
-        y >= m.y && y < m.y + mh;
-
-        if (inside) {
-            return false; 
         }
     }
 
@@ -1259,5 +1370,5 @@ class Monster {
 
 }
 
-monsters.push(new Monster(playerX + 80, playerY + 80));
+monsters.push(new Monster(playerX + 140, playerY + 120));
 
