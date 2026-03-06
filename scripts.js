@@ -551,11 +551,20 @@ function gameLoop(timestamp) {
 
     //Monster damage player
     for (const m of monsters) {
+        // Give each monster its own cooldown timer
+        if (!m.lastAttackTime) m.lastAttackTime = 0;
+
         if (rectOverlap(
             { x: playerX, y: playerY, w: 40, h: 40 },
             { x: m.x, y: m.y, w: 128, h: 128 }
-        )){
-            takeDamage(1);
+        )) {
+            const now = Date.now();
+
+            // Monster can only attack every 2 seconds
+            if (now - m.lastAttackTime >= 2000) {
+                takeDamage(1);
+                m.lastAttackTime = now;
+            }
         }
     }
 
