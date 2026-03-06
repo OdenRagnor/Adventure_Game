@@ -561,8 +561,8 @@ function gameLoop(timestamp) {
             const now = Date.now();
 
             // Monster can only attack every 2 seconds
-            if (now - m.lastAttackTime >= 2000) {
-                takeDamage(1);
+            if (now - m.lastAttackTime >= 1000) {
+                takeDamage(10);
                 m.lastAttackTime = now;
             }
         }
