@@ -989,11 +989,11 @@ drawDungeonSprite("ltGSbDg", 21492, 21172);
 drawDungeonSprite("rtGSbDg", 21556, 21172);
 
 drawDungeonSprite("wallBetweenfull", 21392, 21110);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20822);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20830);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20840);
 drawDungeonSprite("tpHalfWallBetweenfull", 21392, 21030);
 drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20970);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20818);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20830);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20800);
 
 drawDungeonSprite("wallBetweenfull", 21192, 21285);
 drawDungeonSprite("btHalfwallBetweenfull", 21192, 21433);
