@@ -981,6 +981,7 @@ drawDungeonSprite("btGDg", 21940, 21466);
 
 
 // second left
+drawDungeonSprite("btRtHalfwallBetweenfull", 21488, 20870);
 drawDungeonSprite("ltGSbDg", 21492, 21300);
 drawDungeonSprite("rtGSbDg", 21556, 21300);
 drawDungeonSprite("ltGSbDg", 21492, 21304);
@@ -1000,9 +1001,9 @@ drawDungeonSprite("btHalfwallBetweenfull", 21192, 21529);
 drawDungeonSprite("btHalfwallBetweenfull", 21192, 21569);
 drawDungeonSprite("tpHalfWallBetweenfull", 21192, 21205);
 drawDungeonSprite("tpHalfWallBetweenfull", 21192, 21145);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20820);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20830);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20800);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20890);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20850);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20816);
 
 // third left
 drawDungeonSprite("ltGSbDg", 21640, 21300);
@@ -1145,7 +1146,7 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22178, 21170);
 
 // first hallway after circle room
 drawDungeonSprite("tpRtHalfWallBetweenfull", 21488, 20815);
-drawDungeonSprite("btRtHalfwallBetweenfull", 21488, 20870);
+drawDungeonSprite("btRtHalfwallBetweenfull", 21512, 20870);
 drawDungeonSprite("tpRtHalfWallBetweenfull", 21518, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 21518, 20870);
 drawDungeonSprite("tpRtHalfWallBetweenfull", 21548, 20815);
