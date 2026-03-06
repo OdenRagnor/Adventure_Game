@@ -991,9 +991,7 @@ drawDungeonSprite("rtGSbDg", 21556, 21172);
 drawDungeonSprite("wallBetweenfull", 21392, 21110);
 drawDungeonSprite("tpHalfWallBetweenfull", 21392, 21030);
 drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20970);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20818);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20830);
-drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20800);
+
 
 drawDungeonSprite("wallBetweenfull", 21192, 21285);
 drawDungeonSprite("btHalfwallBetweenfull", 21192, 21433);
@@ -1002,6 +1000,9 @@ drawDungeonSprite("btHalfwallBetweenfull", 21192, 21529);
 drawDungeonSprite("btHalfwallBetweenfull", 21192, 21569);
 drawDungeonSprite("tpHalfWallBetweenfull", 21192, 21205);
 drawDungeonSprite("tpHalfWallBetweenfull", 21192, 21145);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20820);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20830);
+drawDungeonSprite("tpHalfWallBetweenfull", 21392, 20800);
 
 // third left
 drawDungeonSprite("ltGSbDg", 21640, 21300);
