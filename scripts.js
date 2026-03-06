@@ -333,7 +333,7 @@ const animations = {
 //Attack hitbox
 
 function getAttackHitbox() {
-    const size = 60; //attack range
+    const size = 32; //attack range
     const px = playerX;
     const py = playerY;
 
