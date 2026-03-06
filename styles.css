@@ -163,6 +163,7 @@ html, body {
     background-repeat: no-repeat;
     transform: scale(4);
     transform-origin: top left;
+    z-index: 1;
 }
 
 #gameMenu {
@@ -189,4 +190,15 @@ html, body {
   margin: 8px 0;
   font-size: 16px;
   cursor: pointer;
+}
+
+.monster {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    transform: scale(2);
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    transform-origin: top left;
+    z-index: 5;
 }

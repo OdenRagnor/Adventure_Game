@@ -2,9 +2,12 @@
 let playerHealth = 10;
 let maxHealth = 100;
 
+const TRASH_X = -999999;
+const TRASH_Y = -999999;
+
 let playerStamina = 100;
 let maxStamina = 100;
-
+let monsters = [];
 
 let playerXP = 0;
 let playerLvlMaxXP = 100;
@@ -17,6 +20,8 @@ const playerLvl = document.getElementById("playerLvl");
 
 let playerMana = 10;
 let maxMana = 100;
+
+const background = document.getElementById("background");
 
 // --- Element Selections ---
 // Thanks to 'defer', we can safely do this at the top level.
@@ -323,6 +328,38 @@ const animations = {
     }
 };
 
+//Attack hitbox
+
+function getAttackHitbox() {
+    const size = 60; //attack range
+    const px = playerX;
+    const py = playerY;
+
+    if (direction === "up") {
+        return { x: px - 20, y: py - size, w : 40, h: size };
+    }
+    if (direction === "down") {
+        return { x: px - 20, y: py + 40, w: 40, h: size };
+    }
+    if (direction === "left") {
+        return { x: px - size, y: py - 20, w: size, h: 40 };
+    }
+    if (direction === "right") {
+        return { x: px + 40, y: py - 20, w: size, h: 40 };
+    }
+}
+
+//Rectangle overlap helper
+
+function rectOverlap(a, b) {
+    return (
+        a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y
+    );
+}
+
 //Attack animation
 
 let isAttacking = false;
@@ -334,6 +371,14 @@ function startAttack() {
     isAttacking = true;
     setPlayerState("attack");
     
+    const hitbox = getAttackHitbox();
+
+    monsters.forEach(mon => {
+        if (rectOverlap(hitbox, { x: mon.x, y: mon.y, w:128, h: 128})) {
+            mon.takeDamage(10);
+        }
+    });
+
     // Attack animation lasts 6 frames × 80ms = 480ms
     setTimeout(() => {
         isAttacking = false;
@@ -466,12 +511,44 @@ function gameLoop(timestamp) {
         }
     }
 
+    //Monster damage player
+    for (const m of monsters) {
+        if (rectOverlap(
+            { x: playerX, y: playerY, w: 40, h: 40 },
+            { x: m.x, y: m.y, w: 128, h: 128 }
+        )){
+            takeDamage(1);
+        }
+    }
+
+    monsters.forEach(m => {
+        const speed = 1;
+
+        const dx = playerX - m.x;
+        const dy = playerY - m.y;
+        const len = Math.hypot(dx, dy);
+
+        if (len < 300) {
+            m.x += (dx / len) * speed;
+            m.y += (dy / len) * speed;
+            m.updatePosition();
+        }
+    });
+
+
     // Camera follow
     cameraX = playerX - window.innerWidth / 2;
     cameraY = playerY - window.innerHeight / 2;
 
     background.style.left = -cameraX + "px";
     background.style.top = -cameraY + "px";
+
+    console.log("loop");
+
+    
+    console.log("loop");
+    console.log("player:", playerX, playerY);
+    console.log("camera:", cameraX, cameraY);
 
     updateAnimation(timestamp);
     goFullscreen();
@@ -682,6 +759,8 @@ function isTileAt(x, y) {
 
     let foundWalkable = false;
 
+    if (!foundWalkable) console.log("No walkable tile under player");
+
     for (const tile of tiles) {
         const tx = parseInt(tile.dataset.x);
         const ty = parseInt(tile.dataset.y);
@@ -704,6 +783,19 @@ function isTileAt(x, y) {
             }
 
             foundWalkable = true;
+        }
+    }
+
+    for (const m of monsters) {
+        const mw = 16;
+        const mh = 16;
+
+        const inside = 
+            x >= m.x && x < m.x + mw &&
+        y >= m.y && y < m.y + mh;
+
+        if (inside) {
+            return false; 
         }
     }
 
@@ -1109,3 +1201,63 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("loadBtn").addEventListener("click", loadGame);
 
 });
+
+
+//=============================================
+//Making Monsters
+//=============================================
+
+class Monster {
+    constructor(x, y, hp = 20) {
+        this.x = x;
+        this.y = y;
+        this.hp = hp;
+
+        this.element = document.createElement('div');
+        this.element.classList.add("monster")
+        this.element.style.width = "32px";
+        this.element.style.height = "32px";
+        this.element.style.backgroundImage = "url(sprites/huntAnimals/Deer_Idle.png)";
+        this.element.style.backgroundRepeat = "no-repeat";
+        this.element.style.imageRendering = "pixelated";
+        this.element.style.position = "absolute";
+
+        document.getElementById("background").appendChild(this.element);
+
+        this.updatePosition();
+    }
+
+    takeDamage(amount) {
+        this.hp -= amount;
+        if (this.hp <= 0) this.die();
+    }
+
+    /*die() {
+        console.log("Monster died:", this.x, this.y);
+        console.log("Monsters array after death:", monsters);
+        this.element.remove();
+        monsters = monsters.filter(m => m !== this);
+    }*/
+   die() {
+        console.log("Monsters array after death:", monsters);
+        console.log("Monster died:", this.x, this.y);
+        this.dead = true;
+        
+        this.x = TRASH_X;
+        this.y = TRASH_Y;
+        this.updatePosition();
+        if (this.element) {
+            this.element.remove();
+        }
+    }
+
+
+    updatePosition() {
+        this.element.style.left = this.x + "px";
+        this.element.style.top = this.y + "px";
+    }
+
+}
+
+monsters.push(new Monster(playerX + 80, playerY + 80));
+
