@@ -574,6 +574,17 @@ function gameLoop(timestamp) {
     monsters.forEach(m => {
         const speed = 2;
 
+        // Distance to player
+        const dist = Math.hypot(playerX - m.x, playerY - m.y);
+
+        // Ignore player unless within 200px
+        if (dist > 400) {
+            // Still update position so DOM stays synced
+            m.updatePosition();
+            return;
+        }
+
+        // --- CHASE LOGIC (only runs if close enough) ---
         const dx = playerX - m.x;
         const dy = playerY - m.y;
         const len = Math.hypot(dx, dy);
@@ -595,7 +606,6 @@ function gameLoop(timestamp) {
         }
 
         m.updatePosition();
-
     });
 
 
@@ -1432,5 +1442,5 @@ class Monster {
 
 }
 
-monsters.push(new Monster(playerX + 140, playerY + 120));
+monsters.push(new Monster(playerX + 540, playerY + 120));
 
