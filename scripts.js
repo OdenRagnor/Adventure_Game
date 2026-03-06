@@ -1,5 +1,5 @@
 // --- Global Variables ---
-let playerHealth = 10;
+let playerHealth = 100;
 let maxHealth = 100;
 
 const TRASH_X = -999999;
