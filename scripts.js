@@ -86,6 +86,8 @@ function takeDamage(amount) {
     // Ensure health doesn't go below 0.
     if (playerHealth < 0) {
         playerHealth = 0;
+        death();
+        gamePaused = true;
     }
 
     console.log("Player health: ", playerHealth);
