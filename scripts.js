@@ -1335,7 +1335,8 @@ function saveGame() {
     playerLvlMaxXP,
     playerLevel,
     gamePaused
-  };
+    
+    };
 
   saveToPC(data);
 }
@@ -1532,23 +1533,29 @@ function updateMonsterAnimation(mon, timestamp) {
 
 //UI Assets
 
-function invBtn() {
-    const msg = document.createElement("div");
-    msg.textContent = "Inventory";
-    msg.style.position = "absolute";
-    msg.style.bottom = "7%";
-    msg.style.right = "5%";
-    msg.style.background = "black";
-    msg.style.color = "white";
-    msg.style.padding = "20px";
-    msg.style.fontSize = "24px";
-    msg.style.border = "2px solid white";
-    msg.style.zIndex = "9999999999";
-    msg.style.textAlign = "center";
+// Create inventory window once
+const inventoryWindow = document.createElement("div");
+inventoryWindow.textContent = "Inventory";
+inventoryWindow.style.position = "absolute";
+inventoryWindow.style.bottom = "7%";
+inventoryWindow.style.right = "5%";
+inventoryWindow.style.background = "black";
+inventoryWindow.style.color = "white";
+inventoryWindow.style.padding = "20px";
+inventoryWindow.style.fontSize = "24px";
+inventoryWindow.style.border = "2px solid white";
+inventoryWindow.style.zIndex = "9999999999";
+inventoryWindow.style.textAlign = "center";
+inventoryWindow.style.display = "none";
+document.body.appendChild(inventoryWindow);
 
-    document.body.appendChild(msg);
+// Toggle function
+function invBtn() {
+    inventoryWindow.style.display =
+        inventoryWindow.style.display === "none" ? "block" : "none";
 }
 
+// Button
 const inventory = document.createElement("button");
 inventory.classList.add("InvBtn");
 inventory.style.width = "36px";
@@ -1561,7 +1568,7 @@ inventory.style.zIndex = "9999999999";
 inventory.style.background = "url(sprites/UI/Inventory.png)";
 inventory.style.backgroundColor = "whitesmoke";
 inventory.style.borderRadius = "5px";
-inventory.style.transform = "scale(1.25)"
+inventory.style.transform = "scale(1.25)";
 inventory.addEventListener("click", invBtn);
-document.body.appendChild(inventory);
 
+document.body.appendChild(inventory);
