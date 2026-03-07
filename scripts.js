@@ -1011,6 +1011,24 @@ drawDungeonSprite("btGDg", 22396, 21304);
 drawDungeonSprite("btGDg", 22396, 21348);
 drawDungeonSprite("btGDg", 22396, 21392);
 
+drawDungeonSprite("btGDg", 22196, 21436);
+drawDungeonSprite("btGDg", 22396, 21436);
+drawDungeonSprite("btGDg", 22196, 21480);
+drawDungeonSprite("btGDg", 22396, 21480);
+drawDungeonSprite("btGDg", 22196, 21524);
+drawDungeonSprite("btGDg", 22396, 21524);
+drawDungeonSprite("btGDg", 22196, 21568);
+drawDungeonSprite("btGDg", 22396, 21568);
+drawDungeonSprite("btGDg", 22196, 21602);
+drawDungeonSprite("btGDg", 22396, 21602);
+drawDungeonSprite("btGDg", 22196, 21646);
+drawDungeonSprite("btGDg", 22396, 21646);
+drawDungeonSprite("btGDg", 22196, 21690);
+drawDungeonSprite("btGDg", 22396, 21690);
+drawDungeonSprite("btGDg", 22196, 21734);
+drawDungeonSprite("btGDg", 22396, 21734);
+drawDungeonSprite("btGDg", 22196, 21778);
+drawDungeonSprite("btGDg", 22396, 21778);
 
 // first left
 drawDungeonSprite("tpGDg", 21428, 21412);
@@ -1266,6 +1284,16 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22392, 20816);
 
 drawDungeonSprite("tpRtHalfWallBetweenfull", 22328, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 22328, 20870);
+
+
+
+drawDungeonSprite("wallBetweenfull", 22392, 21810);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21730);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21670);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21590);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21550);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21516);
+
 
 // ===============================
 // SAVE / LOAD SYSTEM FOR YOUR GAME
