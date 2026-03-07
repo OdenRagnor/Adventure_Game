@@ -760,7 +760,7 @@ function drawDungeonSprite(name, x, y) {
 }
 
 
-//Music
+// Music
 const townTracks = [
   new Audio("Music/woodland/woodland1.mp3"),
   new Audio("Music/woodland/woodland2.mp3"),
@@ -773,24 +773,39 @@ const townTracks = [
   new Audio("Music/woodland/woodland9.mp3")
 ];
 
-// Set shared properties
+// Shared properties
 townTracks.forEach(track => {
-  track.loop = true;
+  track.loop = false;     // IMPORTANT: disable looping
   track.volume = 0.5;
 });
 
+let currentTownTrack = null;
+
+// Pick a random track that isn't the same as the last one
 function playRandomTownTrack() {
+  // stop all
   townTracks.forEach(t => {
     t.pause();
     t.currentTime = 0;
   });
 
-  const track = townTracks[Math.floor(Math.random() * townTracks.length)];
-  track.play();
-  return track;
-}
+  let nextTrack;
+  do {
+    nextTrack = townTracks[Math.floor(Math.random() * townTracks.length)];
+  } while (nextTrack === currentTownTrack);
 
-let currentTownTrack;
+  currentTownTrack = nextTrack;
+  currentTownTrack.play();
+
+  // When it ends, pick another
+  currentTownTrack.onended = () => {
+    if (musicEnabled) {
+      playRandomTownTrack();
+    }
+  };
+
+  return currentTownTrack;
+}
 
 // First user click starts music
 document.addEventListener("click", () => {
@@ -808,8 +823,8 @@ document.getElementById("toggleMusic").addEventListener("click", () => {
     });
     musicEnabled = false;
   } else {
-    currentTownTrack = playRandomTownTrack();
     musicEnabled = true;
+    currentTownTrack = playRandomTownTrack();
   }
 });
 
