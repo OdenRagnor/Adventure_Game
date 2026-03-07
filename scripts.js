@@ -557,7 +557,7 @@ function gameLoop(timestamp) {
 
         if (rectOverlap(
             { x: playerX, y: playerY, w: 40, h: 40 },
-            { x: m.x, y: m.y, w: 128, h: 128 }
+            { x: m.x, y: m.y, w: 40, h: 40 }
         )) {
             const now = Date.now();
 
@@ -569,7 +569,10 @@ function gameLoop(timestamp) {
         }
     }
 
-    
+    monsters.forEach(mon => {
+        updateMonsterAnimation(mon, timestamp);
+    });
+
     monsters.forEach(m => {
         const speed = 2;
 
@@ -586,6 +589,23 @@ function gameLoop(timestamp) {
         // --- CHASE LOGIC (only runs if close enough) ---
         const dx = playerX - m.x;
         const dy = playerY - m.y;
+
+        // Direction
+        if (Math.abs(dx) > Math.abs(dy)) {
+            m.direction = dx > 0 ? "right" : "left";
+        } else {
+            m.direction = dy > 0 ? "down" : "up";
+        }
+
+        // State
+        if (dist <= 400) {
+            m.state = "walk";
+        } else if (dist > 400) {
+            m.state = "idle";
+        } else { 
+            m.state = "idle";
+        }
+
         const len = Math.hypot(dx, dy);
 
         const stepX = (dx / len) * speed;
@@ -1426,8 +1446,16 @@ class Deer {
         this.element.style.backgroundRepeat = "no-repeat";
         this.element.style.imageRendering = "pixelated";
         this.element.style.position = "absolute";
-
+        this.state = "idle";
+        this.direction = "down";
+        this.frame = 0;
+        this.lastFrameTime = 0;
         document.getElementById("background").appendChild(this.element);
+
+        this.state = "idle",
+        this.direction = "down",
+        this.frame = 0,
+        this.lastFrameTime = 0,
 
         this.updatePosition();
     }
@@ -1436,7 +1464,7 @@ class Deer {
         this.hp -= amount;
         if (this.hp <= 0) this.die();
     }
-
+    
     /*die() {
         console.log("Monster died:", this.x, this.y);
         console.log("Monsters array after death:", monsters);
@@ -1466,3 +1494,74 @@ class Deer {
 
 monsters.push(new Deer(playerX + 540, playerY + 120));
 monsters.push(new Deer(21940, 21436))
+
+
+const deerAnimations = {
+    idle: {
+        src: "sprites/deer/deer_idle.png",
+        frameWidth: 32,
+        frameHeight: 32,
+        frameCounts: { down: 4, left: 4, right: 4, up: 4 },
+        speed: { down: 200, left: 200, right: 200, up: 200 }
+    },
+    walk: {
+        src: "sprites/deer/deer_walk.png",
+        frameWidth: 32,
+        frameHeight: 32,
+        frameCounts: { down: 4, left: 4, right: 4, up: 4 },
+        speed: { down: 120, left: 120, right: 120, up: 120 }
+    }
+};
+
+function updateMonsterAnimation(mon, timestamp) {
+    const anim = deerAnimations[mon.state];
+    const frameCount = anim.frameCounts[mon.direction];
+    const speed = anim.speed[mon.direction];
+
+    if (timestamp - mon.lastFrameTime >= speed) {
+        mon.frame = (mon.frame + 1) % frameCount;
+        mon.lastFrameTime = timestamp;
+    }
+
+    const row = { down: 0, left: 2, right: 1, up: 3 }[mon.direction];
+    const x = mon.frame * anim.frameWidth;
+    const y = row * anim.frameHeight;
+
+    mon.element.style.backgroundPosition = `-${x}px -${y}px`;
+}
+
+//UI Assets
+
+function invBtn() {
+    const msg = document.createElement("div");
+    msg.textContent = "Inventory";
+    msg.style.position = "absolute";
+    msg.style.bottom = "7%";
+    msg.style.right = "5%";
+    msg.style.background = "black";
+    msg.style.color = "white";
+    msg.style.padding = "20px";
+    msg.style.fontSize = "24px";
+    msg.style.border = "2px solid white";
+    msg.style.zIndex = "9999999999";
+    msg.style.textAlign = "center";
+
+    document.body.appendChild(msg);
+}
+
+const inventory = document.createElement("button");
+inventory.classList.add("InvBtn");
+inventory.style.width = "36px";
+inventory.style.height = "36px";
+inventory.style.cursor = "pointer";
+inventory.style.position = "absolute";
+inventory.style.bottom = "10px";
+inventory.style.right = "10px";
+inventory.style.zIndex = "9999999999";
+inventory.style.background = "url(sprites/UI/Inventory.png)";
+inventory.style.backgroundColor = "whitesmoke";
+inventory.style.borderRadius = "5px";
+inventory.style.transform = "scale(1.25)"
+inventory.addEventListener("click", invBtn);
+document.body.appendChild(inventory);
+
