@@ -375,7 +375,7 @@ function startAttack() {
     const hitbox = getAttackHitbox();
 
     monsters.forEach(mon => {
-        if (rectOverlap(hitbox, { x: mon.x, y: mon.y, w:128, h: 128})) {
+        if (rectOverlap(hitbox, { x: mon.x, y: mon.y, w: 64, h: 64})) {
             mon.takeDamage(10);
         }
     });
@@ -896,7 +896,7 @@ function isTileAt(x, y) {
     const tiles = document.querySelectorAll("#background .sprite");
 
     const px = x - 18;
-    const py = y - 8;
+    const py = y - 2;
 
     let foundWalkable = false;
 
@@ -972,9 +972,25 @@ drawDungeonSprite("btGDg", 21684, 21128);
 drawDungeonSprite("tpGDg", 21940, 21074);
 drawDungeonSprite("btGDg", 21940, 21128);
 
-
 drawDungeonSprite("tpGDg", 22196, 21074);
 drawDungeonSprite("btGDg", 22196, 21128);
+
+drawDungeonSprite("btGDg", 22196, 21172);
+drawDungeonSprite("btGDg", 22196, 21216);
+drawDungeonSprite("btGDg", 22196, 21260);
+drawDungeonSprite("btGDg", 22196, 21304);
+drawDungeonSprite("btGDg", 22196, 21348);
+drawDungeonSprite("btGDg", 22196, 21392);
+
+drawDungeonSprite("tpGDg", 22396, 21074);
+drawDungeonSprite("btGDg", 22396, 21128);
+drawDungeonSprite("btGDg", 22396, 21172);
+drawDungeonSprite("btGDg", 22396, 21216);
+drawDungeonSprite("btGDg", 22396, 21260);
+drawDungeonSprite("btGDg", 22396, 21304);
+drawDungeonSprite("btGDg", 22396, 21348);
+drawDungeonSprite("btGDg", 22396, 21392);
+
 
 // first left
 drawDungeonSprite("tpGDg", 21428, 21412);
@@ -1213,14 +1229,24 @@ drawDungeonSprite("tpRtHalfWallBetweenfull", 22268, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 22268, 20870);
 drawDungeonSprite("tpRtHalfWallBetweenfull", 22298, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 22298, 20870);
-drawDungeonSprite("tpRtHalfWallBetweenfull", 22328, 20815);
-drawDungeonSprite("btRtHalfwallBetweenfull", 22328, 20870);
 drawDungeonSprite("tpRtHalfWallBetweenfull", 22358, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 22358, 20870);
 drawDungeonSprite("tpRtHalfWallBetweenfull", 22388, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 22388, 20870);
 drawDungeonSprite("tpRtHalfWallBetweenfull", 22418, 20815);
 drawDungeonSprite("btRtHalfwallBetweenfull", 22418, 20870);
+
+//Far right
+drawDungeonSprite("wallBetweenfull", 22392, 21110);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21030);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 20970);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 20890);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 20850);
+drawDungeonSprite("tpHalfWallBetweenfull", 22392, 20816);
+
+drawDungeonSprite("tpRtHalfWallBetweenfull", 22328, 20815);
+drawDungeonSprite("btRtHalfwallBetweenfull", 22328, 20870);
+
 // ===============================
 // SAVE / LOAD SYSTEM FOR YOUR GAME
 // ===============================
