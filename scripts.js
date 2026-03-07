@@ -274,12 +274,11 @@ function updateXPBar() {
 
 }
 
-// Example: Make the player take 10 damage every 2 seconds.
+/*
 setInterval(() => {
-        gainXP(99999999999999999);
+        gainXP(0);
 }, 1); 
-
-updateXPBar();
+*/
 
 function updateLevelBoxWidth() {
     const digits = playerLevel.toString().length;
@@ -596,12 +595,18 @@ function gameLoop(timestamp) {
         const nextY = m.y + stepY;
 
         // X movement
-        if (monsterCanMoveTo(nextX, m.y) && !monsterWouldHitPlayer(nextX, m.y)) {
+        if (monsterCanMoveTo(nextX, m.y) &&
+            !monsterWouldHitPlayer(nextX, m.y) &&
+            !monsterWouldHitMonster(m, nextX, m.y)) {
+
             m.x = nextX;
         }
 
         // Y movement
-        if (monsterCanMoveTo(m.x, nextY) && !monsterWouldHitPlayer(m.x, nextY)) {
+        if (monsterCanMoveTo(m.x, nextY) &&
+            !monsterWouldHitPlayer(m.x, nextY) &&
+            !monsterWouldHitMonster(m, m.x, nextY)) {
+
             m.y = nextY;
         }
 
@@ -789,41 +794,6 @@ document.getElementById("toggleMusic").addEventListener("click", () => {
 });
 
 
-
-
-/*function drawDungeonSprite(name, x, y) {
-    const s = groundSprites[name] || wallSprites[name];
-    
-    if (!s) {
-        console.error("Unknown sprite:", name);
-        return;
-    }
-
-    const el = document.createElement("div");
-    el.classList.add("sprite");
-
-    el.style.width = s.w + "px";
-    el.style.height = s.h + "px";
-
-    // Choose the correct PNG depending on which set it came from
-    const isWall = wallSprites[name] !== undefined;
-    el.style.backgroundImage = isWall
-        ? "url('sprites/dungeonAssets/decorative_cracks_Walls.png')"
-        : "url('sprites/dungeonAssets/decorative_cracks_floor.png')";
-
-    el.style.backgroundPosition = `-${s.x}px -${s.y}px`;
-
-    el.style.left = x + "px";
-    el.style.top = y + "px";
-
-    el.dataset.x = x;
-    el.dataset.y = y;
-    el.dataset.w = s.w;
-    el.dataset.h = s.h;
-
-    document.getElementById("background").appendChild(el);
-}*/
-
 function getPlayerHitbox() {
     return {
         x: playerX + 8,
@@ -831,6 +801,32 @@ function getPlayerHitbox() {
         w: 16,
         h: 16
     };
+}
+
+function monsterWouldHitMonster(mon, nextX, nextY) {
+    const boxNext = {
+        x: nextX + 32,
+        y: nextY + 32,
+        w: 16,
+        h: 16
+    };
+
+    for (const other of monsters) {
+        if (other === mon || other.dead) continue;
+
+        const otherBox = {
+            x: other.x + 32,
+            y: other.y + 32,
+            w: 16,
+            h: 16
+        };
+
+        if (rectOverlap(boxNext, otherBox)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function playerWouldHitMonster(nextX, nextY) {
@@ -1390,7 +1386,7 @@ window.addEventListener("DOMContentLoaded", () => {
 //Making Monsters
 //=============================================
 
-class Monster {
+class Deer {
     constructor(x, y, hp = 20) {
         this.x = x;
         this.y = y;
@@ -1425,7 +1421,7 @@ class Monster {
         console.log("Monsters array after death:", monsters);
         console.log("Monster died:", this.x, this.y);
         this.dead = true;
-        
+        gainXP(10);
         this.x = TRASH_X;
         this.y = TRASH_Y;
         this.updatePosition();
@@ -1442,5 +1438,5 @@ class Monster {
 
 }
 
-monsters.push(new Monster(playerX + 540, playerY + 120));
-
+monsters.push(new Deer(playerX + 540, playerY + 120));
+monsters.push(new Deer(21940, 21436))
