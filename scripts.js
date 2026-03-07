@@ -1042,14 +1042,22 @@ drawDungeonSprite("btGDg", 22196, 21690);
 drawDungeonSprite("btGDg", 22396, 21690);
 drawDungeonSprite("btGDg", 22196, 21734);
 drawDungeonSprite("btGDg", 22396, 21734);
+
 drawDungeonSprite("btGDg", 22196, 21778);
 drawDungeonSprite("btGDg", 22396, 21778);
-
 drawDungeonSprite("btGDg", 21796, 21778);
 drawDungeonSprite("btGDg", 21996, 21778);
 drawDungeonSprite("btGDg", 21396, 21778);
 drawDungeonSprite("btGDg", 21596, 21778);
 drawDungeonSprite("btGDg", 21196, 21778);
+
+drawDungeonSprite("btGDg", 22196, 21812);
+drawDungeonSprite("btGDg", 22396, 21812);
+drawDungeonSprite("btGDg", 21796, 21812);
+drawDungeonSprite("btGDg", 21996, 21812);
+drawDungeonSprite("btGDg", 21396, 21812);
+drawDungeonSprite("btGDg", 21596, 21812);
+drawDungeonSprite("btGDg", 21196, 21812);
 
 // first left
 drawDungeonSprite("tpGDg", 21428, 21412);
