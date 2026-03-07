@@ -1045,6 +1045,12 @@ drawDungeonSprite("btGDg", 22396, 21734);
 drawDungeonSprite("btGDg", 22196, 21778);
 drawDungeonSprite("btGDg", 22396, 21778);
 
+drawDungeonSprite("btGDg", 21796, 21778);
+drawDungeonSprite("btGDg", 21996, 21778);
+drawDungeonSprite("btGDg", 21396, 21778);
+drawDungeonSprite("btGDg", 21596, 21778);
+drawDungeonSprite("btGDg", 21196, 21778);
+
 // first left
 drawDungeonSprite("tpGDg", 21428, 21412);
 drawDungeonSprite("tpGDg", 21400, 21412);
