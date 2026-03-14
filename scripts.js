@@ -227,21 +227,6 @@ function death() {
     document.body.appendChild(msg);
 }
 
-
-// Example: Make the player take 10 damage every 2 seconds.
-/*setInterval(() => {
-    if (!gamePaused) {
-        if (playerHealth > 0) {
-            takeDamage(10);
-        } else {
-            death();
-            gamePaused = true;
-        }
-    }
-
-
-}, 2000)*/
-
 function gainXP(amount) {
     playerXP += amount;
 
@@ -324,7 +309,6 @@ const animations = {
 };
 
 //Attack hitbox
-
 function getAttackHitbox() {
     const size = 32; //attack range
     const px = playerX;
@@ -563,12 +547,24 @@ function gameLoop(timestamp) {
         }
     }
 
+    const screenLeft = cameraX - 200;
+    const screenRight = cameraX + window.innerWidth + 200;
+    const screenTop = cameraY - 200;
+    const screenBottom = cameraY + window.innerHeight + 200;
+
     monsters.forEach(mon => {
-        updateMonsterAnimation(mon, timestamp);
+        if (
+            mon.x > screenLeft &&
+            mon.x < screenRight &&
+            mon.y > screenTop &&
+            mon.y < screenBottom
+        ) {
+            updateMonsterAnimation(mon, timestamp);
+        }
     });
 
     monsters.forEach(m => {
-        const speed = 2;
+        const speed = 3.9;
 
         // Distance to player
         const dist = Math.hypot(playerX - m.x, playerY - m.y);
@@ -577,6 +573,11 @@ function gameLoop(timestamp) {
         if (dist > 400) {
             // Still update position so DOM stays synced
             m.updatePosition();
+            return;
+        }
+
+        if (dist > 800) {
+            // Skip ALL logic: no animation, no movement, no DOM writes
             return;
         }
 
