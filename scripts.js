@@ -2,6 +2,9 @@
 let playerHealth = 100;
 let maxHealth = 100;
 
+let monsterFrameCounter = 0;
+let cachedTiles = [];
+
 const TRASH_X = -999999;
 const TRASH_Y = -999999;
 
@@ -747,6 +750,8 @@ function drawDungeonSprite(name, x, y) {
     el.dataset.w = s.w;
     el.dataset.h = s.h;
 
+    background.appendChild(el);
+    cachedTiles.push(el);
     document.getElementById("background").appendChild(el);
 }
 
@@ -918,6 +923,34 @@ function monsterWouldHitPlayer(nextX, nextY) {
 }
 
 function isTileAt(x, y) {
+    const px = x - 18;
+    const py = y - 2;
+
+    let foundWalkable = false;
+
+    for (const tile of cachedTiles) {
+        const tx = parseInt(tile.dataset.x);
+        const ty = parseInt(tile.dataset.y);
+
+        const SCALE = 4;
+        const tw = parseInt(tile.dataset.w) * SCALE;
+        const th = parseInt(tile.dataset.h) * SCALE;
+
+        const inside =
+            px >= tx && px < tx + tw &&
+            py >= ty && py < ty + th;
+
+        if (inside) {
+            if (tile.dataset.walkable === "false") return false;
+            foundWalkable = true;
+        }
+    }
+
+    return foundWalkable;
+}
+
+/*
+function isTileAt(x, y) {
     const tiles = document.querySelectorAll("#background .sprite");
 
     const px = x - 18;
@@ -958,7 +991,7 @@ function isTileAt(x, y) {
     // Nothing under feet = not walkable
     return false;
 }
-
+*/
 
 //Break zoom for player
 document.addEventListener('keydown', function(event) {
