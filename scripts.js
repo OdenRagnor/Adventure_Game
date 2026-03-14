@@ -555,7 +555,7 @@ function gameLoop(timestamp) {
     const screenTop = cameraY - 200;
     const screenBottom = cameraY + window.innerHeight + 200;
 
-    monsters.forEach(mon => {
+    /*monsters.forEach(mon => {
         if (
             mon.x > screenLeft &&
             mon.x < screenRight &&
@@ -564,7 +564,7 @@ function gameLoop(timestamp) {
         ) {
             updateMonsterAnimation(mon, timestamp);
         }
-    });
+    });*/
 
     monsters.forEach(m => {
         const speed = 3.9;
@@ -633,6 +633,7 @@ function gameLoop(timestamp) {
         }
 
         m.updatePosition();
+        updateMonsterAnimation(m, timestamp);
     });
 
 
@@ -1580,12 +1581,12 @@ const deerAnimations = {
         speed: { down: 200, left: 200, right: 200, up: 200 }
     },
     walk: {
-        src: "sprites/deer/deer_walk.png",
+        src: "sprites/huntAnimals/Deer_Run.png",
         frameWidth: 32,
         frameHeight: 32,
-        frameCounts: { down: 4, left: 4, right: 4, up: 4 },
+        frameCounts: { down: 6, left: 6, right: 6, up: 6 },
         speed: { down: 120, left: 120, right: 120, up: 120 }
-    }
+    },
 };
 
 function updateMonsterAnimation(mon, timestamp) {
@@ -1593,6 +1594,10 @@ function updateMonsterAnimation(mon, timestamp) {
     const frameCount = anim.frameCounts[mon.direction];
     const speed = anim.speed[mon.direction];
 
+    mon.element.style.backgroundImage = `url(${anim.src})`;
+    mon.element.style.width = anim.frameWidth + "px";
+    mon.element.style.height = anim.frameHeight + "px";
+    
     if (timestamp - mon.lastFrameTime >= speed) {
         mon.frame = (mon.frame + 1) % frameCount;
         mon.lastFrameTime = timestamp;
