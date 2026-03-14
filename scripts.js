@@ -90,7 +90,6 @@ function takeDamage(amount) {
         gamePaused = true;
     }
 
-    console.log("Player health: ", playerHealth);
     updateHealthBar(); // Call the update function.
 }
 
@@ -113,7 +112,6 @@ function loseMana(amount) {
         playerMana = 0;
     }
 
-    console.log("Player mana: ", playerMana);
     updateManaBar(); // Call the update function.
 }
 
@@ -135,7 +133,6 @@ function healthRegen(amount) {
         playerHealth = maxHealth;
     }
 
-    console.log("Player health: ", playerHealth);
     updateHealthBar(); // Call the update function.
 }
 
@@ -165,7 +162,6 @@ function lowerStamina(amount) {
         playerStamina = 0;
     }
 
-    console.log("Player health: ", playerHealth);
     updateStaminaBar(); // Call the update function.
 }
 
@@ -257,8 +253,6 @@ function gainXP(amount) {
         updateLevelBoxWidth();
     }
 
-
-    console.log("Player XP: ", playerXP);
     updateXPBar();
 }
 
@@ -641,22 +635,15 @@ function gameLoop(timestamp) {
     background.style.left = -cameraX + "px";
     background.style.top = -cameraY + "px";
 
-    console.log("loop");
-
-    
-    console.log("loop");
-    console.log("player:", playerX, playerY);
-    console.log("camera:", cameraX, cameraY);
 
     updateAnimation(timestamp);
-    goFullscreen();
+    
     requestAnimationFrame(gameLoop);
 }
 
 requestAnimationFrame(gameLoop);
-console.log("Player:", playerX, playerY, "dx:", dx, "dy:", dy, "tile:", isTileAt(playerX, playerY));
 
-
+goFullscreen();
 
 // Ground tiles
 
@@ -935,7 +922,7 @@ function isTileAt(x, y) {
 
     let foundWalkable = false;
 
-    if (!foundWalkable) console.log("No walkable tile under player");
+    if (!foundWalkable) 
 
     for (const tile of tiles) {
         const tx = parseInt(tile.dataset.x);
@@ -1523,15 +1510,7 @@ class Deer {
         if (this.hp <= 0) this.die();
     }
     
-    /*die() {
-        console.log("Monster died:", this.x, this.y);
-        console.log("Monsters array after death:", monsters);
-        this.element.remove();
-        monsters = monsters.filter(m => m !== this);
-    }*/
    die() {
-        console.log("Monsters array after death:", monsters);
-        console.log("Monster died:", this.x, this.y);
         this.dead = true;
         gainXP(10);
         this.x = TRASH_X;
