@@ -581,6 +581,10 @@ function gameLoop(timestamp) {
             return;
         }
 
+        if (m.x < screenLeft || m.x > screenRight ||
+        m.y < screenTop || m.y > screenBottom) {
+        return; // skip everything
+    }
         // --- CHASE LOGIC (only runs if close enough) ---
         const dx = playerX - m.x;
         const dy = playerY - m.y;
@@ -711,7 +715,6 @@ const wallSprites = {
     tpRtHalfWallBetweenfull: {x: 58, y: 16, w: 22, h: 35, walkable: false},
     btRtHalfwallBetweenfull: {x: 58, y: 41, w: 22, h: 55, walkable: false},
 }
-
 
 function drawDungeonSprite(name, x, y) {
     const s = groundSprites[name] || wallSprites[name];
@@ -913,7 +916,6 @@ function monsterWouldHitPlayer(nextX, nextY) {
 
     return rectOverlap(monsterBox, playerBox);
 }
-
 
 function isTileAt(x, y) {
     const tiles = document.querySelectorAll("#background .sprite");
