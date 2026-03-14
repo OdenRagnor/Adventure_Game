@@ -1566,7 +1566,9 @@ class Deer {
 }
 
 monsters.push(new Deer(playerX + 540, playerY + 120));
-monsters.push(new Deer(21940, 21436))
+monsters.push(new Deer(21940, 21436));
+monsters.push(new Deer(21980, 21436));
+monsters.push(new Deer(21960, 21436));
 
 
 const deerAnimations = {
