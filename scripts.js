@@ -2,6 +2,8 @@
 let playerHealth = 100;
 let maxHealth = 100;
 
+const MONSTER_INTERACT_RADIUS = 120; // or 150
+
 let monsterFrameCounter = 0;
 let cachedTiles = [];
 
@@ -355,11 +357,26 @@ function startAttack() {
     
     const hitbox = getAttackHitbox();
 
-    monsters.forEach(mon => {
+    const ATTACK_RADIUS = 100;
+
+    for (const mon of monsters) {
+        const dx = mon.x - playerX;
+        const dy = mon.y - playerY;
+
+        if (dx*dx + dy*dy > ATTACK_RADIUS * ATTACK_RADIUS) {
+            continue;
+        }
+
+        if (rectOverlap(hitbox, { x: mon.x, y: mon.y, w: 64, h: 64 })) {
+            mon.takeDamage(10);
+        }
+    }
+    
+    /*monsters.forEach(mon => {
         if (rectOverlap(hitbox, { x: mon.x, y: mon.y, w: 64, h: 64})) {
             mon.takeDamage(10);
         }
-    });
+    });*/
 
     // Attack animation lasts 6 frames × 80ms = 480ms
     setTimeout(() => {
@@ -531,7 +548,32 @@ function gameLoop(timestamp) {
         }
     }
 
-    //Monster damage player
+    const PLAYER_RADIUS = 300; // or even 400 to be super safe
+
+    for (const m of monsters) {
+        // ensure cooldown exists
+        if (!m.lastAttackTime) m.lastAttackTime = 0;
+
+        const dx = m.x - playerX;
+        const dy = m.y - playerY;
+
+        // broad-phase: skip far monsters
+        if (dx*dx + dy*dy > PLAYER_RADIUS * PLAYER_RADIUS) {
+            continue;
+        }
+
+        if (rectOverlap(
+            { x: playerX, y: playerY, w: 40, h: 40 },
+            { x: m.x, y: m.y, w: 40, h: 40 }
+        )) {
+            const now = Date.now();
+            if (now - m.lastAttackTime >= 1500) {
+                takeDamage(10);
+                m.lastAttackTime = now;
+            }
+        }
+    }
+    /*//Monster damage player
     for (const m of monsters) {
         // Give each monster its own cooldown timer
         if (!m.lastAttackTime) m.lastAttackTime = 0;
@@ -548,23 +590,12 @@ function gameLoop(timestamp) {
                 m.lastAttackTime = now;
             }
         }
-    }
+    }*/
 
     const screenLeft = cameraX - 200;
     const screenRight = cameraX + window.innerWidth + 200;
     const screenTop = cameraY - 200;
     const screenBottom = cameraY + window.innerHeight + 200;
-
-    /*monsters.forEach(mon => {
-        if (
-            mon.x > screenLeft &&
-            mon.x < screenRight &&
-            mon.y > screenTop &&
-            mon.y < screenBottom
-        ) {
-            updateMonsterAnimation(mon, timestamp);
-        }
-    });*/
 
     monsters.forEach(m => {
         const speed = 3.9;
@@ -574,8 +605,6 @@ function gameLoop(timestamp) {
 
         // Ignore player unless within 200px
         if (dist > 400) {
-            // Still update position so DOM stays synced
-            m.updatePosition();
             return;
         }
 
@@ -634,7 +663,7 @@ function gameLoop(timestamp) {
 
         m.updatePosition();
         updateMonsterAnimation(m, timestamp);
-    });
+    }); 
 
 
     // Camera follow
@@ -835,7 +864,41 @@ function getPlayerHitbox() {
     };
 }
 
+
 function monsterWouldHitMonster(mon, nextX, nextY) {
+    const boxNext = {
+        x: nextX + 32,
+        y: nextY + 32,
+        w: 16,
+        h: 16
+    };
+
+    for (const other of monsters) {
+        if (other === mon || other.dead) continue;
+
+        // Broad-phase: skip if too far
+        const dx = other.x - nextX;
+        const dy = other.y - nextY;
+        if (dx*dx + dy*dy > MONSTER_INTERACT_RADIUS * MONSTER_INTERACT_RADIUS) {
+            continue;
+        }
+
+        // Narrow-phase: actual hitbox overlap
+        const otherBox = {
+            x: other.x + 32,
+            y: other.y + 32,
+            w: 16,
+            h: 16
+        };
+
+        if (rectOverlap(boxNext, otherBox)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+/*function monsterWouldHitMonster(mon, nextX, nextY) {
     const boxNext = {
         x: nextX + 32,
         y: nextY + 32,
@@ -859,7 +922,7 @@ function monsterWouldHitMonster(mon, nextX, nextY) {
     }
 
     return false;
-}
+}*/
 
 function playerWouldHitMonster(nextX, nextY) {
     const pNext = {
@@ -1597,7 +1660,7 @@ function updateMonsterAnimation(mon, timestamp) {
     mon.element.style.backgroundImage = `url(${anim.src})`;
     mon.element.style.width = anim.frameWidth + "px";
     mon.element.style.height = anim.frameHeight + "px";
-    
+
     if (timestamp - mon.lastFrameTime >= speed) {
         mon.frame = (mon.frame + 1) % frameCount;
         mon.lastFrameTime = timestamp;
