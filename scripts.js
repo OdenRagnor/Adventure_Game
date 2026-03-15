@@ -1,73 +1,32 @@
 // --- Global Variables ---
-let playerHealth = 100;
-let maxHealth = 100;
-
-const MONSTER_INTERACT_RADIUS = 120; // or 150
-
-let monsterFrameCounter = 0;
-let cachedTiles = [];
-
-const TRASH_X = -999999;
-const TRASH_Y = -999999;
-
-let playerStamina = 100;
-let maxStamina = 100;
-let monsters = [];
-
-let playerXP = 0;
-let playerLvlMaxXP = 100;
-
+//======================Player Level logic================================================
 let playerLevel = 1;
-
-let gamePaused = false;
-
 const playerLvl = document.getElementById("playerLvl");
 
+//======================Player modifiers==================================================
+let manaModifier = 1;
+let healthModifier = 1;
+let staminaModifier = 1;
+let xpModifier = 1;
+
+//=======================Player stats=====================================================
+let playerHealth = 100;
+let maxHealth = (playerLevel * .5 * healthModifier) + 100;
+let playerXP = 0;
+let playerLvlMaxXP = 100;
+let playerStamina = 100;
+let maxStamina = (playerLevel * .5 * staminaModifier) + 100;
 let playerMana = 10;
-let maxMana = 100;
+let maxMana = (playerLevel * .5 * manaModifier) + 100;
 
-const background = document.getElementById("background");
-
-// --- Element Selections ---
-// Thanks to 'defer', we can safely do this at the top level.
+//=======================Stat Bar Functions================================================
 const healthBarFill = document.getElementById("healthBarFill");
-
 const xpBarFill = document.getElementById("xpBarFill");
-
 const manaBarFill = document.getElementById("manaBarFill");
-
 const staminaBarFill = document.getElementById("staminaBarFill");
-
 const staminaBar = document.getElementById("staminaBar");
 
-// It's still good practice to check if the element was found.
-if (!healthBarFill) {
-    console.error("Critical Error: Could not find element with ID 'healthBarFill'. Check your HTML for typos.");
-}
-
-
-// --- Functions ---
-
-
-function goFullscreen() {
-    const elem = document.documentElement; // whole page
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-    }
-}
-
-document.addEventListener("click", function initFullscreen() {
-    goFullscreen();
-    document.removeEventListener("click", initFullscreen);
-});
-
-/**
- * Updates the health bar's visual width based on playerHealth.
- */
+//Health bar functions
 function updateHealthBar() {
     // Make sure we don't try to update a missing element.
     if (!healthBarFill) return;
@@ -85,6 +44,7 @@ function updateHealthBar() {
 
 }
 
+//damage function
 function takeDamage(amount) {
     playerHealth -= amount;
 
@@ -98,38 +58,7 @@ function takeDamage(amount) {
     updateHealthBar(); // Call the update function.
 }
 
-function updateManaBar() {
-    // Make sure we don't try to update a missing element.
-    if (!manaBarFill) return;
-    const manaPercentage = (playerMana / maxMana) * 100;
-    // Set the width of the inner fill div.
-    manaBarFill.style.width = Math.max(0, manaPercentage) + '%';
-
-}
-
-
-
-function loseMana(amount) {
-    playerMana -= amount;
-
-    // Ensure health doesn't go below 0.
-    if (playerMana < 0) {
-        playerMana = 0;
-    }
-
-    updateManaBar(); // Call the update function.
-}
-
-setInterval(() => {
-    if (!gamePaused) {
-        if ((playerHealth < maxHealth) || (playerMana < maxMana) || (playerStamina < maxStamina)) {
-            healthRegen(1);
-            manaRegen(2);
-            staminaRegen(4);
-        } 
-    }
-}, 2000);
-
+//health Regeneration 
 function healthRegen(amount) {
     playerHealth += amount;
 
@@ -141,6 +70,29 @@ function healthRegen(amount) {
     updateHealthBar(); // Call the update function.
 }
 
+//Mana bar functions
+function updateManaBar() {
+    // Make sure we don't try to update a missing element.
+    if (!manaBarFill) return;
+    const manaPercentage = (playerMana / maxMana) * 100;
+    // Set the width of the inner fill div.
+    manaBarFill.style.width = Math.max(0, manaPercentage) + '%';
+
+}
+
+//lose mana function
+function loseMana(amount) {
+    playerMana -= amount;
+
+    // Ensure health doesn't go below 0.
+    if (playerMana < 0) {
+        playerMana = 0;
+    }
+
+    updateManaBar(); // Call the update function.
+}
+
+//Mana Regeneration
 function manaRegen(amount) {
     playerMana += amount;
 
@@ -150,7 +102,7 @@ function manaRegen(amount) {
     updateManaBar(); 
 }
 
-
+//Stamina Bar functions
 function updateStaminaBar() {
     // Make sure we don't try to update a missing element.
     if (!staminaBarFill) return;
@@ -159,6 +111,7 @@ function updateStaminaBar() {
     staminaBarFill.style.width = Math.max(0, staminaPercentage) + '%';
 }
 
+//lose stamina
 function lowerStamina(amount) {
     playerStamina -= amount;
 
@@ -170,6 +123,7 @@ function lowerStamina(amount) {
     updateStaminaBar(); // Call the update function.
 }
 
+//stamina regeneration
 function staminaRegen(amount) {
     playerStamina += amount;
 
@@ -179,6 +133,7 @@ function staminaRegen(amount) {
     updateStaminaBar(); 
 }
 
+//when running or attacking deplete stamina 
 setInterval(() => {
     if (!gamePaused) {
         if ((keys["ShiftLeft"] || keys["ShiftRight"]) &&
@@ -195,9 +150,58 @@ setInterval(() => {
     updateStaminaBar();
 }, 500);
 
+//Health, Mana, and Stamina Regeneration interval
+setInterval(() => {
+    if (!gamePaused) {
+        if ((playerHealth < maxHealth) || (playerMana < maxMana) || (playerStamina < maxStamina)) {
+            healthRegen(1);
+            manaRegen(2);
+            staminaRegen(4);
+        } 
+    }
+}, 2000);
+
+
 updateStaminaBar();
 updateManaBar();
 updateHealthBar();
+
+//=======================Monster Logic=====================================================
+const MONSTER_INTERACT_RADIUS = 120; // or 150
+let monsterFrameCounter = 0;
+let cachedTiles = [];
+let monsters = [];
+
+//Where I throw dead monsters.
+const TRASH_X = -999999;
+const TRASH_Y = -999999;
+
+//=======================game state=========================================================
+let gamePaused = false;
+
+
+
+const background = document.getElementById("background");
+
+//======================Force game to go full screen========================================
+function goFullscreen() {
+    const elem = document.documentElement; // whole page
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+    }
+}
+
+document.addEventListener("click", function initFullscreen() {
+    goFullscreen();
+    document.removeEventListener("click", initFullscreen);
+});
+
+
+
 // Set the initial visual state of the health bar.
 
 function death() {
