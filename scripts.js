@@ -150,6 +150,43 @@ setInterval(() => {
     updateStaminaBar();
 }, 500);
 
+
+//===================XP Bar functions==============================
+function gainXP(amount) {
+    playerXP += amount;
+
+    while (playerXP >= playerLvlMaxXP) {
+        playerXP -= playerLvlMaxXP;   // carry leftover XP
+        playerLvlMaxXP = Math.floor(playerLvlMaxXP + (playerLvlMaxXP * 0.05));
+        playerLevel ++;
+        playerLvl.textContent = playerLevel;
+        updateLevelBoxWidth();
+    }
+
+    updateXPBar();
+}
+
+function updateXPBar() {
+    // Make sure we don't try to update a missing element.
+    if (!xpBarFill) return;
+
+    //adding XP Bar functions
+    const xpPercentage = (playerXP / playerLvlMaxXP) * 100;
+
+    // Set the width of the inner fill div.
+    xpBarFill.style.width = Math.max(0, xpPercentage) + '%';
+
+}
+
+function updateLevelBoxWidth() {
+    const digits = playerLevel.toString().length;
+    const baseWidth = 35;   // your original width
+    const staminaBaseWidth = 184;
+    const extra = (digits - 1) * 10;
+    playerLvl.style.width = (baseWidth + extra) + "px";
+    staminaBar.style.width = (staminaBaseWidth + extra) + "px";
+}
+
 //Health, Mana, and Stamina Regeneration interval
 setInterval(() => {
     if (!gamePaused) {
@@ -160,7 +197,6 @@ setInterval(() => {
         } 
     }
 }, 2000);
-
 
 updateStaminaBar();
 updateManaBar();
@@ -180,7 +216,7 @@ const TRASH_Y = -999999;
 let gamePaused = false;
 
 
-
+//created background variable...
 const background = document.getElementById("background");
 
 //======================Force game to go full screen========================================
@@ -236,49 +272,7 @@ function death() {
     document.body.appendChild(msg);
 }
 
-function gainXP(amount) {
-    playerXP += amount;
-
-    while (playerXP >= playerLvlMaxXP) {
-        playerXP -= playerLvlMaxXP;   // carry leftover XP
-        playerLvlMaxXP = Math.floor(playerLvlMaxXP + (playerLvlMaxXP * 0.05));
-        playerLevel ++;
-        playerLvl.textContent = playerLevel;
-        updateLevelBoxWidth();
-    }
-
-    updateXPBar();
-}
-
-function updateXPBar() {
-    // Make sure we don't try to update a missing element.
-    if (!xpBarFill) return;
-
-    //adding XP Bar functions
-    const xpPercentage = (playerXP / playerLvlMaxXP) * 100;
-
-    // Set the width of the inner fill div.
-    xpBarFill.style.width = Math.max(0, xpPercentage) + '%';
-
-}
-
-/*
-setInterval(() => {
-        gainXP(0);
-}, 1); 
-*/
-
-function updateLevelBoxWidth() {
-    const digits = playerLevel.toString().length;
-    const baseWidth = 35;   // your original width
-    const staminaBaseWidth = 184;
-    const extra = (digits - 1) * 10;
-    playerLvl.style.width = (baseWidth + extra) + "px";
-    staminaBar.style.width = (staminaBaseWidth + extra) + "px";
-}
-
 // Player sprite system
-
 let dx = 0;
 let dy = 0;
 let playerState = "idle";
@@ -505,7 +499,7 @@ function gameLoop(timestamp) {
     if (keys["KeyS"]) dy = 1;
     if (keys["KeyA"]) dx = -1;
     if (keys["KeyD"]) dx = 1;
-
+    //====================Player Run
     if ((keys["ShiftLeft"] || keys["ShiftRight"]) && (keys["KeyW"] || keys["KeyS"] || keys["KeyA"] || keys["KeyD"])) {
         playerSpeed = 6;
         if (playerStamina === 0) {
@@ -526,8 +520,9 @@ function gameLoop(timestamp) {
         setPlayerState("attack");
     } else if (dx === 0 && dy === 0) {
         setPlayerState("idle");
-    } else if (keys["ShiftLeft"] || keys["ShiftRight"]) {
+    } else if ((keys["ShiftLeft"] || keys["ShiftRight"]) && (playerStamina > 0)) {
         setPlayerState("run");
+        updateStaminaBar();
     } else {
         setPlayerState("walk");
     }
@@ -577,24 +572,6 @@ function gameLoop(timestamp) {
             }
         }
     }
-    /*//Monster damage player
-    for (const m of monsters) {
-        // Give each monster its own cooldown timer
-        if (!m.lastAttackTime) m.lastAttackTime = 0;
-
-        if (rectOverlap(
-            { x: playerX, y: playerY, w: 40, h: 40 },
-            { x: m.x, y: m.y, w: 40, h: 40 }
-        )) {
-            const now = Date.now();
-
-            // Monster can only attack every 2 seconds
-            if (now - m.lastAttackTime >= 1500) {
-                takeDamage(10);
-                m.lastAttackTime = now;
-            }
-        }
-    }*/
 
     const screenLeft = cameraX - 200;
     const screenRight = cameraX + window.innerWidth + 200;
