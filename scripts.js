@@ -238,9 +238,19 @@ document.addEventListener("click", function initFullscreen() {
     document.removeEventListener("click", initFullscreen);
 });
 
-
-
+//===============================================================================
 //================================Player functions===============================
+//===============================================================================
+
+//============Player Hit Box=====================================
+function getPlayerHitbox() {
+    return {
+        x: playerX + 8,
+        y: playerY + 8,
+        w: 16,
+        h: 16
+    };
+}
 
 //==============Player Death Logic==============================
 function death() {
@@ -483,25 +493,56 @@ function playerSprite() {
     }
 }
 
-//=================Checks if Monsters will collide with an object===================
-function monsterCanMoveTo(x, y) {
-    const centerX = x;
-    const centerY = y;
 
-    const ox = centerX + 40; // shift hitbox right
-    const oy = centerY + 40; // shift hitbox down
-    const w = 16;
-    const h = 16;
+//===========Player Hits Monster Area===============
+function playerWouldHitMonster(nextX, nextY) {
+    const pNext = {
+        x: nextX - 18,
+        y: nextY - 8,
+        w: 16,
+        h: 16
+    };
 
-    return (
-        isTileAt(ox, oy) &&
-        isTileAt(ox + w, oy) &&
-        isTileAt(ox, oy + h) &&
-        isTileAt(ox + w, oy + h)
-    );
+    const pCur = {
+        x: playerX - 18,
+        y: playerY - 8,
+        w: 16,
+        h: 16
+    };
+
+    // helper to get center
+    function center(box) {
+        return {
+            x: box.x + box.w / 2,
+            y: box.y + box.h / 2
+        };
+    }
+
+    const pCurC = center(pCur);
+    const pNextC = center(pNext);
+
+    for (const m of monsters) {
+        const mBox = {
+            x: m.x + 8,
+            y: m.y + 8,
+            w: 16,
+            h: 16
+        };
+        const mC = center(mBox);
+
+        const distCur = Math.hypot(pCurC.x - mC.x, pCurC.y - mC.y);
+        const distNext = Math.hypot(pNextC.x - mC.x, pNextC.y - mC.y);
+
+        // Only block if:
+        // 1) next position overlaps AND
+        // 2) you're moving CLOSER to the monster
+        if (rectOverlap(pNext, mBox) && distNext < distCur) {
+            return true;
+        }
+    }
+
+    return false;
 }
-
-
 //============Player movement logic==========================
 function playerMovement() {
     dx = 0;
@@ -544,7 +585,30 @@ function playerMovement() {
         }
     }
 }
+//==================================================================================
+//==============================Monster Logic=======================================
+//==================================================================================
 
+//=================Checks if Monsters will collide with an object===================
+function monsterCanMoveTo(x, y) {
+    const centerX = x;
+    const centerY = y;
+
+    const ox = centerX + 40; // shift hitbox right
+    const oy = centerY + 40; // shift hitbox down
+    const w = 16;
+    const h = 16;
+
+    return (
+        isTileAt(ox, oy) &&
+        isTileAt(ox + w, oy) &&
+        isTileAt(ox, oy + h) &&
+        isTileAt(ox + w, oy + h)
+    );
+}
+
+
+//Monster attacks player
 function monsterAttack() {
     const PLAYER_RADIUS = 300; // or even 400 to be super safe
 
@@ -573,6 +637,55 @@ function monsterAttack() {
     }
 }
 
+
+//========================Monster runs into monster====================================
+function monsterWouldHitMonster(mon, nextX, nextY) {
+    const boxNext = {
+        x: nextX + 32,
+        y: nextY + 32,
+        w: 16,
+        h: 16
+    };
+
+    for (const other of monsters) {
+        if (other === mon || other.dead) continue;
+
+        // Broad-phase: skip if too far
+        const dx = other.x - nextX;
+        const dy = other.y - nextY;
+        if (dx*dx + dy*dy > MONSTER_INTERACT_RADIUS * MONSTER_INTERACT_RADIUS) {
+            continue;
+        }
+
+        // Narrow-phase: actual hitbox overlap
+        const otherBox = {
+            x: other.x + 32,
+            y: other.y + 16,
+            w: 16,
+            h: 16
+        };
+
+        if (rectOverlap(boxNext, otherBox)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//=============Monster hits Player======================
+function monsterWouldHitPlayer(nextX, nextY) {
+    const playerBox = getPlayerHitbox();
+
+    const monsterBox = {
+        x: nextX + 32,  // same offset you used for monster hitbox
+        y: nextY + 16,
+        w: 16,
+        h: 16
+    };
+
+    return rectOverlap(monsterBox, playerBox);
+}
 //==============Camera follow Character logic=================
 function cameraLogic() {
     cameraX = playerX - window.innerWidth / 2;
@@ -589,16 +702,10 @@ function gameLoop(timestamp) {
     
     if (gamePaused) return;
 
-    playerAttack();
-    playerSprite();
-    playerMovement();
-    monsterAttack();
-
     const screenLeft = cameraX - 200;
     const screenRight = cameraX + window.innerWidth + 200;
     const screenTop = cameraY - 200;
     const screenBottom = cameraY + window.innerHeight + 200;
-
 
     monsters.forEach(m => {
         const speed = 3.9;
@@ -668,6 +775,10 @@ function gameLoop(timestamp) {
         updateMonsterAnimation(m, timestamp);
     }); 
 
+    playerAttack();
+    playerMovement();
+    playerSprite();
+    monsterAttack();
     cameraLogic();
     updateAnimation(timestamp);
     
@@ -675,8 +786,302 @@ function gameLoop(timestamp) {
 }
 
 requestAnimationFrame(gameLoop);
-
 goFullscreen();
+
+//================================================
+//==================Music=========================
+//================================================
+const townTracks = [
+  new Audio("Music/woodland/woodland1.mp3"),
+  new Audio("Music/woodland/woodland2.mp3"),
+  new Audio("Music/woodland/woodland3.mp3"),
+  new Audio("Music/woodland/woodland4.mp3"),
+  new Audio("Music/woodland/woodland5.mp3"),
+  new Audio("Music/woodland/woodland6.mp3"),
+  new Audio("Music/woodland/woodland7.mp3"),
+  new Audio("Music/woodland/woodland8.mp3"),
+  new Audio("Music/woodland/woodland9.mp3")
+];
+
+// Shared properties
+townTracks.forEach(track => {
+  track.loop = false;     // IMPORTANT: disable looping
+  track.volume = 0.5;
+});
+
+let currentTownTrack = null;
+
+// Pick a random track that isn't the same as the last one
+function playRandomTownTrack() {
+  // stop all
+  townTracks.forEach(t => {
+    t.pause();
+    t.currentTime = 0;
+  });
+
+  let nextTrack;
+  do {
+    nextTrack = townTracks[Math.floor(Math.random() * townTracks.length)];
+  } while (nextTrack === currentTownTrack);
+
+  currentTownTrack = nextTrack;
+  currentTownTrack.play();
+
+  // When it ends, pick another
+  currentTownTrack.onended = () => {
+    if (musicEnabled) {
+      playRandomTownTrack();
+    }
+  };
+
+  return currentTownTrack;
+}
+
+// First user click starts music
+document.addEventListener("click", () => {
+  currentTownTrack = playRandomTownTrack();
+}, { once: true });
+
+// MUSIC TOGGLE BUTTON
+let musicEnabled = true;
+
+document.getElementById("toggleMusic").addEventListener("click", () => {
+  if (musicEnabled) {
+    townTracks.forEach(t => {
+      t.pause();
+      t.currentTime = 0;
+    });
+    musicEnabled = false;
+  } else {
+    musicEnabled = true;
+    currentTownTrack = playRandomTownTrack();
+  }
+});
+
+//============================================================================================
+//==============================Functions for UI==============================================
+//============================================================================================
+
+//Break zoom for player
+document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && (event.key === '+' || event.key === '-' || event.key === '=')) {
+        event.preventDefault();
+    }
+}, false);
+
+// Prevent mouse wheel zoom
+document.addEventListener('wheel', function(event) {
+    if (event.ctrlKey) {
+        event.preventDefault();
+    }
+}, { passive: false });
+
+// ===============================
+// SAVE / LOAD SYSTEM FOR YOUR GAME
+// ===============================
+
+// Download a save file to the player's PC
+function saveToPC(data) {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "MyGameSave.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+  console.log("Save file downloaded");
+}
+
+// Load a save file from the player's PC
+function loadFromPC(callback) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = event => {
+      try {
+        const data = JSON.parse(event.target.result);
+        callback(data);
+        console.log("Save file loaded");
+      } catch (err) {
+        console.error("Invalid save file");
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+}
+
+// ===============================
+// SAVE GAME (your variables)
+// ===============================
+
+function saveGame() {
+  const data = {
+    playerX,
+    playerY,
+    playerSpeed,
+    dx,
+    dy,
+    playerState,
+    direction,
+    playerMana,
+    maxMana,
+    playerHealth,
+    maxHealth,
+    playerStamina,
+    maxStamina,
+    playerXP,
+    playerLvlMaxXP,
+    playerLevel,
+    gamePaused
+    
+    };
+
+  saveToPC(data);
+}
+
+// ===============================
+// LOAD GAME (restore variables)
+// ===============================
+
+function loadGame() {
+
+  // If fullscreen is active, exit it first
+  const wasFullscreen = !!document.fullscreenElement;
+
+  if (wasFullscreen) {
+    document.exitFullscreen();
+  }
+
+  // Now open the file picker safely
+  loadFromPC(data => {
+
+    // Restore your variables
+    playerX = data.playerX;
+    playerY = data.playerY;
+    playerSpeed = data.playerSpeed;
+    dx = data.dx;
+    dy = data.dy;
+    playerState = data.playerState;
+    direction = data.direction;
+    playerMana = data.playerMana;
+    maxMana = data.maxMana;
+    playerHealth = data.playerHealth;
+    maxHealth = data.maxHealth;
+    playerStamina = data.playerStamina;
+    maxStamina = data.maxStamina;
+    playerXP = data.playerXP;
+    playerLvlMaxXP = data.playerLvlMaxXP;
+    playerLevel = data.playerLevel;
+    gamePaused = data.gamePaused;
+
+    console.log("Game state restored");
+
+    // Re-enter fullscreen AFTER loading
+    if (wasFullscreen) {
+      document.documentElement.requestFullscreen();
+    }
+  });
+}
+
+// ===============================
+// OPTIONAL: KEYBINDS
+// ===============================
+
+document.addEventListener("keydown", e => {
+  if (e.key === "k") saveGame(); // Press K to save
+  if (e.key === "l") loadGame(); // Press L to load
+});
+
+// ==========================
+// Menu
+// ==========================
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  const gameMenu = document.getElementById("gameMenu");
+  const closeMenuBtn = document.getElementById("closeMenu");
+
+  function openMenu() {
+    gameMenu.style.display = "block";
+  }
+
+  function closeMenu() {
+    gameMenu.style.display = "none";
+  }
+
+  closeMenuBtn.addEventListener("click", closeMenu);
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "o") {
+      if (gameMenu.style.display === "block") {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", saveGame);
+  document.getElementById("loadBtn").addEventListener("click", loadGame);
+
+});
+
+//UI Assets
+
+// Create inventory window once
+const inventoryWindow = document.createElement("div");
+inventoryWindow.textContent = "Inventory";
+inventoryWindow.style.position = "absolute";
+inventoryWindow.style.bottom = "7%";
+inventoryWindow.style.right = "5%";
+inventoryWindow.style.background = "black";
+inventoryWindow.style.color = "white";
+inventoryWindow.style.padding = "20px";
+inventoryWindow.style.fontSize = "24px";
+inventoryWindow.style.border = "2px solid white";
+inventoryWindow.style.zIndex = "9999999999";
+inventoryWindow.style.textAlign = "center";
+inventoryWindow.style.display = "none";
+document.body.appendChild(inventoryWindow);
+
+// Toggle function
+function invBtn() {
+    inventoryWindow.style.display =
+        inventoryWindow.style.display === "none" ? "block" : "none";
+}
+
+// Button
+const inventory = document.createElement("button");
+inventory.classList.add("InvBtn");
+inventory.style.width = "36px";
+inventory.style.height = "36px";
+inventory.style.cursor = "pointer";
+inventory.style.position = "absolute";
+inventory.style.bottom = "10px";
+inventory.style.right = "10px";
+inventory.style.zIndex = "9999999999";
+inventory.style.background = "url(sprites/UI/Inventory.png)";
+inventory.style.backgroundColor = "whitesmoke";
+inventory.style.borderRadius = "5px";
+inventory.style.transform = "scale(1.25)";
+inventory.addEventListener("click", invBtn);
+
+document.body.appendChild(inventory);
+
+//===========================================================================
+//==========================Map Functions====================================
+//===========================================================================
 
 // Ground tiles
 
@@ -780,207 +1185,6 @@ function drawDungeonSprite(name, x, y) {
     document.getElementById("background").appendChild(el);
 }
 
-
-// Music
-const townTracks = [
-  new Audio("Music/woodland/woodland1.mp3"),
-  new Audio("Music/woodland/woodland2.mp3"),
-  new Audio("Music/woodland/woodland3.mp3"),
-  new Audio("Music/woodland/woodland4.mp3"),
-  new Audio("Music/woodland/woodland5.mp3"),
-  new Audio("Music/woodland/woodland6.mp3"),
-  new Audio("Music/woodland/woodland7.mp3"),
-  new Audio("Music/woodland/woodland8.mp3"),
-  new Audio("Music/woodland/woodland9.mp3")
-];
-
-// Shared properties
-townTracks.forEach(track => {
-  track.loop = false;     // IMPORTANT: disable looping
-  track.volume = 0.5;
-});
-
-let currentTownTrack = null;
-
-// Pick a random track that isn't the same as the last one
-function playRandomTownTrack() {
-  // stop all
-  townTracks.forEach(t => {
-    t.pause();
-    t.currentTime = 0;
-  });
-
-  let nextTrack;
-  do {
-    nextTrack = townTracks[Math.floor(Math.random() * townTracks.length)];
-  } while (nextTrack === currentTownTrack);
-
-  currentTownTrack = nextTrack;
-  currentTownTrack.play();
-
-  // When it ends, pick another
-  currentTownTrack.onended = () => {
-    if (musicEnabled) {
-      playRandomTownTrack();
-    }
-  };
-
-  return currentTownTrack;
-}
-
-// First user click starts music
-document.addEventListener("click", () => {
-  currentTownTrack = playRandomTownTrack();
-}, { once: true });
-
-// MUSIC TOGGLE BUTTON
-let musicEnabled = true;
-
-document.getElementById("toggleMusic").addEventListener("click", () => {
-  if (musicEnabled) {
-    townTracks.forEach(t => {
-      t.pause();
-      t.currentTime = 0;
-    });
-    musicEnabled = false;
-  } else {
-    musicEnabled = true;
-    currentTownTrack = playRandomTownTrack();
-  }
-});
-
-
-function getPlayerHitbox() {
-    return {
-        x: playerX + 8,
-        y: playerY + 8,
-        w: 16,
-        h: 16
-    };
-}
-
-
-function monsterWouldHitMonster(mon, nextX, nextY) {
-    const boxNext = {
-        x: nextX + 32,
-        y: nextY + 32,
-        w: 16,
-        h: 16
-    };
-
-    for (const other of monsters) {
-        if (other === mon || other.dead) continue;
-
-        // Broad-phase: skip if too far
-        const dx = other.x - nextX;
-        const dy = other.y - nextY;
-        if (dx*dx + dy*dy > MONSTER_INTERACT_RADIUS * MONSTER_INTERACT_RADIUS) {
-            continue;
-        }
-
-        // Narrow-phase: actual hitbox overlap
-        const otherBox = {
-            x: other.x + 32,
-            y: other.y + 32,
-            w: 16,
-            h: 16
-        };
-
-        if (rectOverlap(boxNext, otherBox)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-/*function monsterWouldHitMonster(mon, nextX, nextY) {
-    const boxNext = {
-        x: nextX + 32,
-        y: nextY + 32,
-        w: 16,
-        h: 16
-    };
-
-    for (const other of monsters) {
-        if (other === mon || other.dead) continue;
-
-        const otherBox = {
-            x: other.x + 32,
-            y: other.y + 32,
-            w: 16,
-            h: 16
-        };
-
-        if (rectOverlap(boxNext, otherBox)) {
-            return true;
-        }
-    }
-
-    return false;
-}*/
-
-function playerWouldHitMonster(nextX, nextY) {
-    const pNext = {
-        x: nextX - 18,
-        y: nextY - 8,
-        w: 16,
-        h: 16
-    };
-
-    const pCur = {
-        x: playerX - 18,
-        y: playerY - 8,
-        w: 16,
-        h: 16
-    };
-
-    // helper to get center
-    function center(box) {
-        return {
-            x: box.x + box.w / 2,
-            y: box.y + box.h / 2
-        };
-    }
-
-    const pCurC = center(pCur);
-    const pNextC = center(pNext);
-
-    for (const m of monsters) {
-        const mBox = {
-            x: m.x + 8,
-            y: m.y + 8,
-            w: 16,
-            h: 16
-        };
-        const mC = center(mBox);
-
-        const distCur = Math.hypot(pCurC.x - mC.x, pCurC.y - mC.y);
-        const distNext = Math.hypot(pNextC.x - mC.x, pNextC.y - mC.y);
-
-        // Only block if:
-        // 1) next position overlaps AND
-        // 2) you're moving CLOSER to the monster
-        if (rectOverlap(pNext, mBox) && distNext < distCur) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function monsterWouldHitPlayer(nextX, nextY) {
-    const playerBox = getPlayerHitbox();
-
-    const monsterBox = {
-        x: nextX + 32,  // same offset you used for monster hitbox
-        y: nextY + 32,
-        w: 16,
-        h: 16
-    };
-
-    return rectOverlap(monsterBox, playerBox);
-}
-
 function isTileAt(x, y) {
     const px = x - 18;
     const py = y - 2;
@@ -1007,67 +1211,6 @@ function isTileAt(x, y) {
 
     return foundWalkable;
 }
-
-/*
-function isTileAt(x, y) {
-    const tiles = document.querySelectorAll("#background .sprite");
-
-    const px = x - 18;
-    const py = y - 2;
-
-    let foundWalkable = false;
-
-    if (!foundWalkable) 
-
-    for (const tile of tiles) {
-        const tx = parseInt(tile.dataset.x);
-        const ty = parseInt(tile.dataset.y);
-
-        const SCALE = 4;
-
-        const tw = parseInt(tile.dataset.w) * SCALE;
-        const th = parseInt(tile.dataset.h) * SCALE;
-
-        const inside =
-            px >= tx && px < tx + tw &&
-            py >= ty && py < ty + th;
-
-        if (inside) {
-            const walkable = tile.dataset.walkable === "true";
-
-            if (!walkable) {
-                // ⭐ NON-WALKABLE TILE WINS
-                return false;
-            }
-
-            foundWalkable = true;
-        }
-    }
-
-    // If we found at least one walkable tile and no walls
-    if (foundWalkable) return true;
-
-    // Nothing under feet = not walkable
-    return false;
-}
-*/
-
-//Break zoom for player
-document.addEventListener('keydown', function(event) {
-    if (event.ctrlKey && (event.key === '+' || event.key === '-' || event.key === '=')) {
-        event.preventDefault();
-    }
-}, false);
-
-// Prevent mouse wheel zoom
-document.addEventListener('wheel', function(event) {
-    if (event.ctrlKey) {
-        event.preventDefault();
-    }
-}, { passive: false });
-
-
-
 
 // Start area
 
@@ -1405,169 +1548,6 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21590);
 drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21550);
 drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21516);
 
-
-// ===============================
-// SAVE / LOAD SYSTEM FOR YOUR GAME
-// ===============================
-
-// Download a save file to the player's PC
-function saveToPC(data) {
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "MyGameSave.json";
-  a.click();
-
-  URL.revokeObjectURL(url);
-  console.log("Save file downloaded");
-}
-
-// Load a save file from the player's PC
-function loadFromPC(callback) {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = ".json";
-
-  input.onchange = e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = event => {
-      try {
-        const data = JSON.parse(event.target.result);
-        callback(data);
-        console.log("Save file loaded");
-      } catch (err) {
-        console.error("Invalid save file");
-      }
-    };
-
-    reader.readAsText(file);
-  };
-
-  input.click();
-}
-
-// ===============================
-// SAVE GAME (your variables)
-// ===============================
-
-function saveGame() {
-  const data = {
-    playerX,
-    playerY,
-    playerSpeed,
-    dx,
-    dy,
-    playerState,
-    direction,
-    playerMana,
-    maxMana,
-    playerHealth,
-    maxHealth,
-    playerStamina,
-    maxStamina,
-    playerXP,
-    playerLvlMaxXP,
-    playerLevel,
-    gamePaused
-    
-    };
-
-  saveToPC(data);
-}
-
-// ===============================
-// LOAD GAME (restore variables)
-// ===============================
-
-function loadGame() {
-
-  // If fullscreen is active, exit it first
-  const wasFullscreen = !!document.fullscreenElement;
-
-  if (wasFullscreen) {
-    document.exitFullscreen();
-  }
-
-  // Now open the file picker safely
-  loadFromPC(data => {
-
-    // Restore your variables
-    playerX = data.playerX;
-    playerY = data.playerY;
-    playerSpeed = data.playerSpeed;
-    dx = data.dx;
-    dy = data.dy;
-    playerState = data.playerState;
-    direction = data.direction;
-    playerMana = data.playerMana;
-    maxMana = data.maxMana;
-    playerHealth = data.playerHealth;
-    maxHealth = data.maxHealth;
-    playerStamina = data.playerStamina;
-    maxStamina = data.maxStamina;
-    playerXP = data.playerXP;
-    playerLvlMaxXP = data.playerLvlMaxXP;
-    playerLevel = data.playerLevel;
-    gamePaused = data.gamePaused;
-
-    console.log("Game state restored");
-
-    // Re-enter fullscreen AFTER loading
-    if (wasFullscreen) {
-      document.documentElement.requestFullscreen();
-    }
-  });
-}
-
-// ===============================
-// OPTIONAL: KEYBINDS
-// ===============================
-
-document.addEventListener("keydown", e => {
-  if (e.key === "k") saveGame(); // Press K to save
-  if (e.key === "l") loadGame(); // Press L to load
-});
-
-// ==========================
-// Menu
-// ==========================
-
-window.addEventListener("DOMContentLoaded", () => {
-
-  const gameMenu = document.getElementById("gameMenu");
-  const closeMenuBtn = document.getElementById("closeMenu");
-
-  function openMenu() {
-    gameMenu.style.display = "block";
-  }
-
-  function closeMenu() {
-    gameMenu.style.display = "none";
-  }
-
-  closeMenuBtn.addEventListener("click", closeMenu);
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "o") {
-      if (gameMenu.style.display === "block") {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    }
-  });
-
-  document.getElementById("saveBtn").addEventListener("click", saveGame);
-  document.getElementById("loadBtn").addEventListener("click", loadGame);
-
-});
-
-
 //=============================================
 //Making Monsters
 //=============================================
@@ -1668,44 +1648,3 @@ function updateMonsterAnimation(mon, timestamp) {
     mon.element.style.backgroundPosition = `-${x}px -${y}px`;
 }
 
-//UI Assets
-
-// Create inventory window once
-const inventoryWindow = document.createElement("div");
-inventoryWindow.textContent = "Inventory";
-inventoryWindow.style.position = "absolute";
-inventoryWindow.style.bottom = "7%";
-inventoryWindow.style.right = "5%";
-inventoryWindow.style.background = "black";
-inventoryWindow.style.color = "white";
-inventoryWindow.style.padding = "20px";
-inventoryWindow.style.fontSize = "24px";
-inventoryWindow.style.border = "2px solid white";
-inventoryWindow.style.zIndex = "9999999999";
-inventoryWindow.style.textAlign = "center";
-inventoryWindow.style.display = "none";
-document.body.appendChild(inventoryWindow);
-
-// Toggle function
-function invBtn() {
-    inventoryWindow.style.display =
-        inventoryWindow.style.display === "none" ? "block" : "none";
-}
-
-// Button
-const inventory = document.createElement("button");
-inventory.classList.add("InvBtn");
-inventory.style.width = "36px";
-inventory.style.height = "36px";
-inventory.style.cursor = "pointer";
-inventory.style.position = "absolute";
-inventory.style.bottom = "10px";
-inventory.style.right = "10px";
-inventory.style.zIndex = "9999999999";
-inventory.style.background = "url(sprites/UI/Inventory.png)";
-inventory.style.backgroundColor = "whitesmoke";
-inventory.style.borderRadius = "5px";
-inventory.style.transform = "scale(1.25)";
-inventory.addEventListener("click", invBtn);
-
-document.body.appendChild(inventory);
