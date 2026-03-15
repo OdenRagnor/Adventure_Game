@@ -478,12 +478,10 @@ function playerCanMoveTo(x, y) {
         );
     }
 
-function gameLoop(timestamp) {
-    
-    if (gamePaused) return;
 
-    
-    if (keys["Space"]){
+///===================Player Attack==================
+function playerAttack() {
+if (keys["Space"]){
         startAttack();
     }
 
@@ -491,6 +489,14 @@ function gameLoop(timestamp) {
         dx = 0;
         dy = 0;
     }
+}
+
+function gameLoop(timestamp) {
+    
+    if (gamePaused) return;
+
+    playerAttack();
+    
 
     dx = 0;
     dy = 0;
@@ -499,7 +505,7 @@ function gameLoop(timestamp) {
     if (keys["KeyS"]) dy = 1;
     if (keys["KeyA"]) dx = -1;
     if (keys["KeyD"]) dx = 1;
-    //====================Player Run
+    //====================Player Run=============================================
     if ((keys["ShiftLeft"] || keys["ShiftRight"]) && (keys["KeyW"] || keys["KeyS"] || keys["KeyA"] || keys["KeyD"])) {
         playerSpeed = 6;
         if (playerStamina === 0) {
