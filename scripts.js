@@ -8,6 +8,7 @@ let manaModifier = 1;
 let healthModifier = 1;
 let staminaModifier = 1;
 let xpModifier = 1;
+let speedModifier = 1;
 
 //=======================Player stats=====================================================
 let playerHealth = 100;
@@ -18,6 +19,7 @@ let playerStamina = 100;
 let maxStamina = (playerLevel * .5 * staminaModifier) + 100;
 let playerMana = 10;
 let maxMana = (playerLevel * .5 * manaModifier) + 100;
+let playerSpeed = 4 * speedModifier;
 
 //=======================Stat Bar Functions================================================
 const healthBarFill = document.getElementById("healthBarFill");
@@ -238,8 +240,9 @@ document.addEventListener("click", function initFullscreen() {
 
 
 
-// Set the initial visual state of the health bar.
+//================================Player functions===============================
 
+//==============Player Death Logic==============================
 function death() {
     const msg = document.createElement("div");
     msg.textContent = "You have died!";
@@ -273,6 +276,7 @@ function death() {
 }
 
 // Player sprite system
+const playerElement = document.getElementById("player");
 let dx = 0;
 let dy = 0;
 let playerState = "idle";
@@ -311,7 +315,7 @@ const animations = {
     }
 };
 
-//Attack hitbox
+//Player Attack hitbox
 function getAttackHitbox() {
     const size = 32; //attack range
     const px = playerX;
@@ -332,7 +336,6 @@ function getAttackHitbox() {
 }
 
 //Rectangle overlap helper
-
 function rectOverlap(a, b) {
     return (
         a.x < b.x + b.w &&
@@ -341,8 +344,6 @@ function rectOverlap(a, b) {
         a.y + a.h > b.y
     );
 }
-
-//Attack animation
 
 let isAttacking = false;
 
@@ -369,12 +370,6 @@ function startAttack() {
             mon.takeDamage(10);
         }
     }
-    
-    /*monsters.forEach(mon => {
-        if (rectOverlap(hitbox, { x: mon.x, y: mon.y, w: 64, h: 64})) {
-            mon.takeDamage(10);
-        }
-    });*/
 
     // Attack animation lasts 6 frames × 80ms = 480ms
     setTimeout(() => {
@@ -383,8 +378,7 @@ function startAttack() {
     }, 480);
 }
 
-const playerElement = document.getElementById("player");
-
+//Player Animation
 function setPlayerState(newState) {
     if (newState !== playerState) {
         playerState = newState;
@@ -428,9 +422,13 @@ function updateAnimation(timestamp) {
 
 // Movement + camera
 
+//Player start location
 let playerX = 21370;
 let playerY = 21320; // 21364 - 48
-let playerSpeed = 4;
+
+//Camera Variables
+let cameraX = 0;
+let cameraY = 0;
 
 const keys = {};
 
@@ -442,42 +440,21 @@ document.addEventListener("keyup", e => {
     keys[e.code] = false;
 });
 
-let cameraX = 0;
-let cameraY = 0;
-
-
+//===================Checks if the Player will collide with an object===========
 function playerCanMoveTo(x, y) {
-        const ox = x + 8;  // shift hitbox right
-        const oy = y + 8;  // shift hitbox down
-        const w = 16;
-        const h = 16;
+    const ox = x + 8;  // shift hitbox right
+    const oy = y + 8;  // shift hitbox down
+    const w = 16;
+    const h = 16;
 
-        return (
-            isTileAt(ox, oy) &&
-            isTileAt(ox + w, oy) &&
-            isTileAt(ox, oy + h) &&
-            isTileAt(ox + w, oy + h)
-        );
+    return (
+        isTileAt(ox, oy) &&
+        isTileAt(ox + w, oy) &&
+        isTileAt(ox, oy + h) &&
+        isTileAt(ox + w, oy + h)
+    );
 
-    }
-
-    function monsterCanMoveTo(x, y) {
-        const centerX = x;
-        const centerY = y;
-
-        const ox = centerX + 40; // shift hitbox right
-        const oy = centerY + 40; // shift hitbox down
-        const w = 16;
-        const h = 16;
-
-        return (
-            isTileAt(ox, oy) &&
-            isTileAt(ox + w, oy) &&
-            isTileAt(ox, oy + h) &&
-            isTileAt(ox + w, oy + h)
-        );
-    }
-
+}
 
 ///===================Player Attack==================
 function playerAttack() {
@@ -491,13 +468,42 @@ if (keys["Space"]){
     }
 }
 
-function gameLoop(timestamp) {
-    
-    if (gamePaused) return;
+//====================Player State=============
+function playerSprite() {
+    // State
+    if (isAttacking) {
+        setPlayerState("attack");
+    } else if (dx === 0 && dy === 0) {
+        setPlayerState("idle");
+    } else if ((keys["ShiftLeft"] || keys["ShiftRight"]) && (playerStamina > 0)) {
+        setPlayerState("run");
+        updateStaminaBar();
+    } else {
+        setPlayerState("walk");
+    }
+}
 
-    playerAttack();
-    
+//=================Checks if Monsters will collide with an object===================
+function monsterCanMoveTo(x, y) {
+    const centerX = x;
+    const centerY = y;
 
+    const ox = centerX + 40; // shift hitbox right
+    const oy = centerY + 40; // shift hitbox down
+    const w = 16;
+    const h = 16;
+
+    return (
+        isTileAt(ox, oy) &&
+        isTileAt(ox + w, oy) &&
+        isTileAt(ox, oy + h) &&
+        isTileAt(ox + w, oy + h)
+    );
+}
+
+
+//============Player movement logic==========================
+function playerMovement() {
     dx = 0;
     dy = 0;
     // Movement input
@@ -512,26 +518,11 @@ function gameLoop(timestamp) {
             playerSpeed = 4;
         }
     } else {playerSpeed = 4}
-    
-
     // Direction
     if (dy < 0) setDirection("up");
     else if (dy > 0) setDirection("down");
     else if (dx < 0) setDirection("left");
     else if (dx > 0) setDirection("right");
-
-    
-    // State
-    if (isAttacking) {
-        setPlayerState("attack");
-    } else if (dx === 0 && dy === 0) {
-        setPlayerState("idle");
-    } else if ((keys["ShiftLeft"] || keys["ShiftRight"]) && (playerStamina > 0)) {
-        setPlayerState("run");
-        updateStaminaBar();
-    } else {
-        setPlayerState("walk");
-    }
 
     // Normalize diagonal
     if (dx !== 0 || dy !== 0) {
@@ -552,7 +543,9 @@ function gameLoop(timestamp) {
             playerY = nextY;
         }
     }
+}
 
+function monsterAttack() {
     const PLAYER_RADIUS = 300; // or even 400 to be super safe
 
     for (const m of monsters) {
@@ -578,11 +571,34 @@ function gameLoop(timestamp) {
             }
         }
     }
+}
+
+//==============Camera follow Character logic=================
+function cameraLogic() {
+    cameraX = playerX - window.innerWidth / 2;
+    cameraY = playerY - window.innerHeight / 2;
+
+    background.style.left = -cameraX + "px";
+    background.style.top = -cameraY + "px";
+}
+
+//=====================================================================
+//==========================GAME LOOP==================================
+//=====================================================================
+function gameLoop(timestamp) {
+    
+    if (gamePaused) return;
+
+    playerAttack();
+    playerSprite();
+    playerMovement();
+    monsterAttack();
 
     const screenLeft = cameraX - 200;
     const screenRight = cameraX + window.innerWidth + 200;
     const screenTop = cameraY - 200;
     const screenBottom = cameraY + window.innerHeight + 200;
+
 
     monsters.forEach(m => {
         const speed = 3.9;
@@ -652,15 +668,7 @@ function gameLoop(timestamp) {
         updateMonsterAnimation(m, timestamp);
     }); 
 
-
-    // Camera follow
-    cameraX = playerX - window.innerWidth / 2;
-    cameraY = playerY - window.innerHeight / 2;
-
-    background.style.left = -cameraX + "px";
-    background.style.top = -cameraY + "px";
-
-
+    cameraLogic();
     updateAnimation(timestamp);
     
     requestAnimationFrame(gameLoop);
