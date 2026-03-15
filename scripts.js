@@ -686,6 +686,28 @@ function monsterWouldHitPlayer(nextX, nextY) {
 
     return rectOverlap(monsterBox, playerBox);
 }
+
+function updateMonsterAnimation(mon, timestamp) {
+    const anim = mon.monsterAnimation[mon.state];
+    const frameCount = anim.frameCounts[mon.direction];
+    const speed = anim.speed[mon.direction];
+
+    mon.element.style.backgroundImage = `url(${anim.src})`;
+    mon.element.style.width = anim.frameWidth + "px";
+    mon.element.style.height = anim.frameHeight + "px";
+
+    if (timestamp - mon.lastFrameTime >= speed) {
+        mon.frame = (mon.frame + 1) % frameCount;
+        mon.lastFrameTime = timestamp;
+    }
+
+    const row = { down: 0, left: 2, right: 1, up: 3 }[mon.direction];
+    const x = mon.frame * anim.frameWidth;
+    const y = row * anim.frameHeight;
+
+    mon.element.style.backgroundPosition = `-${x}px -${y}px`;
+}
+
 //==============Camera follow Character logic=================
 function cameraLogic() {
     cameraX = playerX - window.innerWidth / 2;
@@ -702,7 +724,7 @@ function gameLoop(timestamp) {
     
     if (gamePaused) return;
 
-    const screenLeft = cameraX - 200;
+    /*const screenLeft = cameraX - 200;
     const screenRight = cameraX + window.innerWidth + 200;
     const screenTop = cameraY - 200;
     const screenBottom = cameraY + window.innerHeight + 200;
@@ -773,7 +795,61 @@ function gameLoop(timestamp) {
 
         m.updatePosition();
         updateMonsterAnimation(m, timestamp);
-    }); 
+    }); */
+
+    monsters.forEach(m => {
+        const dist = Math.hypot(playerX - m.x, playerY - m.y);
+
+        // Always animate + update DOM if within 1600px
+        if (dist <= 1600) {
+            updateMonsterAnimation(m, timestamp);
+            m.updatePosition();
+        } else {
+            return; // too far to bother
+        }
+
+        // 800–1600px → visible + animated, but no AI
+        if (dist > 800) {
+            m.state = "idle";
+            return;
+        }
+
+        // 400–800px → idle animation only
+        if (dist > 400) {
+            m.state = "idle";
+            return;
+        }
+
+        // 0–400px → full chase logic
+        m.state = "walk";
+
+        const dx = playerX - m.x;
+        const dy = playerY - m.y;
+        const len = Math.hypot(dx, dy);
+
+        m.direction = Math.abs(dx) > Math.abs(dy)
+            ? (dx > 0 ? "right" : "left")
+            : (dy > 0 ? "down" : "up");
+
+        const speed = 3.9;
+        const stepX = (dx / len) * speed;
+        const stepY = (dy / len) * speed;
+
+        const nextX = m.x + stepX;
+        const nextY = m.y + stepY;
+
+        if (monsterCanMoveTo(nextX, m.y) &&
+            !monsterWouldHitPlayer(nextX, m.y) &&
+            !monsterWouldHitMonster(m, nextX, m.y)) {
+            m.x = nextX;
+        }
+
+        if (monsterCanMoveTo(m.x, nextY) &&
+            !monsterWouldHitPlayer(m.x, nextY) &&
+            !monsterWouldHitMonster(m, m.x, nextY)) {
+            m.y = nextY;
+        }
+    });
 
     playerAttack();
     playerMovement();
@@ -1552,6 +1628,27 @@ drawDungeonSprite("tpHalfWallBetweenfull", 22392, 21516);
 //Making Monsters
 //=============================================
 
+//==============================
+//DEER
+//==============================
+
+const deerAnimations = {
+    idle: {
+        src: "sprites/huntAnimals/Deer_Idle.png",
+        frameWidth: 32,
+        frameHeight: 32,
+        frameCounts: { down: 4, left: 4, right: 4, up: 4 },
+        speed: { down: 200, left: 200, right: 200, up: 200 }
+    },
+    walk: {
+        src: "sprites/huntAnimals/Deer_Run.png",
+        frameWidth: 32,
+        frameHeight: 32,
+        frameCounts: { down: 6, left: 6, right: 6, up: 6 },
+        speed: { down: 120, left: 120, right: 120, up: 120 }
+    },
+};
+
 class Deer {
     constructor(x, y, hp = 20) {
         this.x = x;
@@ -1577,6 +1674,7 @@ class Deer {
         this.frame = 0,
         this.lastFrameTime = 0,
 
+        this.monsterAnimation = deerAnimations;
         this.updatePosition();
     }
 
@@ -1604,47 +1702,93 @@ class Deer {
 
 }
 
+//=======================================================================================
+// DEER Location on Map
+//=======================================================================================
 monsters.push(new Deer(playerX + 540, playerY + 120));
 monsters.push(new Deer(21940, 21436));
 monsters.push(new Deer(21980, 21436));
 monsters.push(new Deer(21960, 21436));
 
+//===============================
+// Orc1
+//===============================
 
-const deerAnimations = {
+const orc1Animations = {
     idle: {
-        src: "sprites/deer/deer_idle.png",
-        frameWidth: 32,
-        frameHeight: 32,
+        src: "sprites/orc1/orc1_idle_without_shadow.png",
+        frameWidth: 64,
+        frameHeight: 64,
         frameCounts: { down: 4, left: 4, right: 4, up: 4 },
         speed: { down: 200, left: 200, right: 200, up: 200 }
     },
     walk: {
-        src: "sprites/huntAnimals/Deer_Run.png",
-        frameWidth: 32,
-        frameHeight: 32,
-        frameCounts: { down: 6, left: 6, right: 6, up: 6 },
+        src: "sprites/orc1/orc1_run_without_shadow.png",
+        frameWidth: 64,
+        frameHeight: 64,
+        frameCounts: { down: 8, left: 8, right: 8, up: 8 },
         speed: { down: 120, left: 120, right: 120, up: 120 }
     },
 };
 
-function updateMonsterAnimation(mon, timestamp) {
-    const anim = deerAnimations[mon.state];
-    const frameCount = anim.frameCounts[mon.direction];
-    const speed = anim.speed[mon.direction];
+class Orc1 {
+    constructor(x, y, hp = 40) {
+        this.x = x;
+        this.y = y;
+        this.hp = hp;
 
-    mon.element.style.backgroundImage = `url(${anim.src})`;
-    mon.element.style.width = anim.frameWidth + "px";
-    mon.element.style.height = anim.frameHeight + "px";
+        this.element = document.createElement('div');
+        this.element.classList.add("monster")
+        this.element.style.width = "32px";
+        this.element.style.height = "32px";
+        this.element.style.backgroundImage = "url(sprites/orc1_idle_without_shadow.png)";
+        this.element.style.backgroundRepeat = "no-repeat";
+        this.element.style.imageRendering = "pixelated";
+        this.element.style.position = "absolute";
+        this.state = "idle";
+        this.direction = "down";
+        this.frame = 0;
+        this.lastFrameTime = 0;
+        document.getElementById("background").appendChild(this.element);
 
-    if (timestamp - mon.lastFrameTime >= speed) {
-        mon.frame = (mon.frame + 1) % frameCount;
-        mon.lastFrameTime = timestamp;
+        this.state = "idle",
+        this.direction = "down",
+        this.frame = 0,
+        this.lastFrameTime = 0,
+
+        this.monsterAnimation = orc1Animations;
+
+        this.updatePosition();
     }
 
-    const row = { down: 0, left: 2, right: 1, up: 3 }[mon.direction];
-    const x = mon.frame * anim.frameWidth;
-    const y = row * anim.frameHeight;
+    takeDamage(amount) {
+        this.hp -= amount;
+        if (this.hp <= 0) this.die();
+    }
+    
+   die() {
+        this.dead = true;
+        gainXP(20);
+        this.x = TRASH_X;
+        this.y = TRASH_Y;
+        this.updatePosition();
+        if (this.element) {
+            this.element.remove();
+        }
+    }
 
-    mon.element.style.backgroundPosition = `-${x}px -${y}px`;
+
+    updatePosition() {
+        this.element.style.left = this.x + "px";
+        this.element.style.top = this.y + "px";
+    }
+
 }
 
+//=======================================================================================
+// Orc1 Location on Map
+//=======================================================================================
+monsters.push(new Orc1(playerX + 540, playerY + 470));
+monsters.push(new Orc1(21940, 21786));
+monsters.push(new Orc1(21980, 21786));
+monsters.push(new Orc1(21960, 21786));
