@@ -522,20 +522,14 @@ function playerWouldHitMonster(nextX, nextY) {
     const pNextC = center(pNext);
 
     for (const m of monsters) {
-        const mBox = {
-            x: m.x + 8,
-            y: m.y + 8,
-            w: 16,
-            h: 16
-        };
+
+        const mBox = getMonsterHitbox(m);  // ← use the real hitbox
+
         const mC = center(mBox);
 
         const distCur = Math.hypot(pCurC.x - mC.x, pCurC.y - mC.y);
         const distNext = Math.hypot(pNextC.x - mC.x, pNextC.y - mC.y);
 
-        // Only block if:
-        // 1) next position overlaps AND
-        // 2) you're moving CLOSER to the monster
         if (rectOverlap(pNext, mBox) && distNext < distCur) {
             return true;
         }
@@ -589,21 +583,25 @@ function playerMovement() {
 //==============================Monster Logic=======================================
 //==================================================================================
 
-//=================Checks if Monsters will collide with an object===================
-function monsterCanMoveTo(x, y) {
-    const centerX = x;
-    const centerY = y;
+function getMonsterHitbox(mon, nextX = mon.x, nextY = mon.y) {
+    return {
+        x: nextX + mon.hitboxOffsetX,
+        y: nextY + mon.hitboxOffsetY,
+        w: mon.hitboxW,
+        h: mon.hitboxH
+    };
+}
 
-    const ox = centerX + 40; // shift hitbox right
-    const oy = centerY + 40; // shift hitbox down
-    const w = 16;
-    const h = 16;
+
+//=================Checks if Monsters will collide with an object===================
+function monsterCanMoveTo(mon, nextX, nextY) {
+    const box = getMonsterHitbox(mon, nextX, nextY);
 
     return (
-        isTileAt(ox, oy) &&
-        isTileAt(ox + w, oy) &&
-        isTileAt(ox, oy + h) &&
-        isTileAt(ox + w, oy + h)
+        isTileAt(box.x, box.y) &&
+        isTileAt(box.x + box.w, box.y) &&
+        isTileAt(box.x, box.y + box.h) &&
+        isTileAt(box.x + box.w, box.y + box.h)
     );
 }
 
@@ -626,7 +624,7 @@ function monsterAttack() {
 
         if (rectOverlap(
             { x: playerX, y: playerY, w: 40, h: 40 },
-            { x: m.x, y: m.y, w: 40, h: 40 }
+            getMonsterHitbox(m)
         )) {
             const now = Date.now();
             if (now - m.lastAttackTime >= 1500) {
@@ -640,30 +638,12 @@ function monsterAttack() {
 
 //========================Monster runs into monster====================================
 function monsterWouldHitMonster(mon, nextX, nextY) {
-    const boxNext = {
-        x: nextX + 32,
-        y: nextY + 32,
-        w: 16,
-        h: 16
-    };
+    const boxNext = getMonsterHitbox(mon, nextX, nextY);
 
     for (const other of monsters) {
         if (other === mon || other.dead) continue;
 
-        // Broad-phase: skip if too far
-        const dx = other.x - nextX;
-        const dy = other.y - nextY;
-        if (dx*dx + dy*dy > MONSTER_INTERACT_RADIUS * MONSTER_INTERACT_RADIUS) {
-            continue;
-        }
-
-        // Narrow-phase: actual hitbox overlap
-        const otherBox = {
-            x: other.x + 32,
-            y: other.y + 16,
-            w: 16,
-            h: 16
-        };
+        const otherBox = getMonsterHitbox(other);
 
         if (rectOverlap(boxNext, otherBox)) {
             return true;
@@ -673,19 +653,15 @@ function monsterWouldHitMonster(mon, nextX, nextY) {
     return false;
 }
 
-//=============Monster hits Player======================
-function monsterWouldHitPlayer(nextX, nextY) {
-    const playerBox = getPlayerHitbox();
 
-    const monsterBox = {
-        x: nextX + 32,  // same offset you used for monster hitbox
-        y: nextY + 16,
-        w: 16,
-        h: 16
-    };
+//=============Monster hits Player======================
+function monsterWouldHitPlayer(mon, nextX, nextY) {
+    const monsterBox = getMonsterHitbox(mon, nextX, nextY);
+    const playerBox = getPlayerHitbox();
 
     return rectOverlap(monsterBox, playerBox);
 }
+
 
 function updateMonsterAnimation(mon, timestamp) {
     const anim = mon.monsterAnimation[mon.state];
@@ -1659,6 +1635,12 @@ class Deer {
         this.element.classList.add("monster")
         this.element.style.width = "32px";
         this.element.style.height = "32px";
+        
+        this.hitboxOffsetX = 8;
+        this.hitboxOffsetY = 8;
+        this.hitboxW = 32;
+        this.hitboxH = 32;
+
         this.element.style.backgroundImage = "url(sprites/huntAnimals/Deer_Idle.png)";
         this.element.style.backgroundRepeat = "no-repeat";
         this.element.style.imageRendering = "pixelated";
@@ -1706,9 +1688,9 @@ class Deer {
 // DEER Location on Map
 //=======================================================================================
 monsters.push(new Deer(playerX + 540, playerY + 120));
-monsters.push(new Deer(21940, 21436));
+/*monsters.push(new Deer(21940, 21436));
 monsters.push(new Deer(21980, 21436));
-monsters.push(new Deer(21960, 21436));
+monsters.push(new Deer(21960, 21436));*/
 
 //===============================
 // Orc1
@@ -1739,8 +1721,14 @@ class Orc1 {
 
         this.element = document.createElement('div');
         this.element.classList.add("monster")
-        this.element.style.width = "32px";
-        this.element.style.height = "32px";
+        this.element.style.width = "64px";
+        this.element.style.height = "64px";
+
+        this.hitboxOffsetX = 20;
+        this.hitboxOffsetY = 20;
+        this.hitboxW = 64;
+        this.hitboxH = 64;
+
         this.element.style.backgroundImage = "url(sprites/orc1_idle_without_shadow.png)";
         this.element.style.backgroundRepeat = "no-repeat";
         this.element.style.imageRendering = "pixelated";
@@ -1789,6 +1777,6 @@ class Orc1 {
 // Orc1 Location on Map
 //=======================================================================================
 monsters.push(new Orc1(playerX + 540, playerY + 470));
-monsters.push(new Orc1(21940, 21786));
+/*monsters.push(new Orc1(21940, 21786));
 monsters.push(new Orc1(21980, 21786));
-monsters.push(new Orc1(21960, 21786));
+monsters.push(new Orc1(21960, 21786));*/
